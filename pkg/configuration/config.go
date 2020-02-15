@@ -1,9 +1,9 @@
-package config
+package configuration
 
 import (
 	"fmt"
 
-	"github.com/oclaussen/dodo/pkg/config/decoder"
+	"github.com/dodo/dodo-config/pkg/decoder"
 	"github.com/oclaussen/dodo/pkg/types"
 	"github.com/oclaussen/go-gimme/configfiles"
 	"github.com/sahilm/fuzzy"
