@@ -1,15 +1,18 @@
 package configuration
 
 import (
-	"github.com/hashicorp/go-plugin"
-	"github.com/oclaussen/dodo/pkg/plugin/configuration"
+	"github.com/oclaussen/dodo/pkg/configuration"
+	"github.com/oclaussen/dodo/pkg/plugin"
 	"github.com/oclaussen/dodo/pkg/types"
 )
 
 type Configuration struct{}
 
-func NewPlugin() plugin.Plugin {
-	return &configuration.Plugin{Impl: &Configuration{}}
+func init() {
+	plugin.RegisterPluginServer(
+		configuration.PluginType,
+		&configuration.Plugin{Impl: &Configuration{}},
+	)
 }
 
 func (p *Configuration) GetClientOptions(_ string) (*configuration.ClientOptions, error) {
@@ -17,12 +20,7 @@ func (p *Configuration) GetClientOptions(_ string) (*configuration.ClientOptions
 }
 
 func (p *Configuration) UpdateConfiguration(backdrop *types.Backdrop) (*types.Backdrop, error) {
-	conf, err := LoadBackdrop(backdrop.Name)
-	if err != nil {
-		return nil, err
-	}
-	backdrop.Merge(conf)
-	return backdrop, nil
+	return LoadBackdrop(backdrop.Name)
 }
 
 func (p *Configuration) Provision(_ string) error {
