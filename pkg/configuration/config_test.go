@@ -1,8 +1,10 @@
-package decoder
+package configuration
 
 import (
 	"testing"
 
+	cfgtypes "github.com/dodo/dodo-config/pkg/types"
+	"github.com/dodo/dodo-config/pkg/decoder"
 	"github.com/oclaussen/dodo/pkg/types"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
@@ -81,9 +83,7 @@ func TestMixedVolumes(t *testing.T) {
 const fullExample = `
 image: testimage
 container_name: testcontainer
-remove: false
 interactive: true
-volumes_from: 'somevolume'
 interpreter: '/bin/sh'
 script: |
   echo "$@"
@@ -100,12 +100,70 @@ func TestFullExample(t *testing.T) {
 	assert.Equal(t, []string{"Hello", "World"}, config.Entrypoint.Arguments)
 }
 
-func getExampleConfig(t *testing.T, yamlConfig string) types.Backdrop {
+const groupedYaml = `
+groups:
+  first:
+    backdrops:
+      example1:
+        image: testimage
+
+    groups:
+      second:
+        backdrops:
+          example2:
+            image: testimage
+
+  third:
+    backdrops:
+      example3:
+        image: testimage
+`
+
+func TestNestedGroups(t *testing.T) {
+	var mapType map[interface{}]interface{}
+	err := yaml.Unmarshal([]byte(groupedYaml), &mapType)
+	assert.Nil(t, err)
+	ptr, decode := NewConfig()
+	config := *(ptr.(**Config))
+        s := decoder.New("test")
+	decode(s, mapType)
+	assert.Contains(t, config.Groups, "first")
+	assert.Contains(t, config.Groups["first"].Backdrops, "example1")
+	assert.Contains(t, config.Groups["first"].Groups, "second")
+	assert.Contains(t, config.Groups["first"].Groups["second"].Backdrops, "example2")
+	assert.Contains(t, config.Groups, "third")
+	assert.Contains(t, config.Groups["third"].Backdrops, "example3")
+}
+
+const includeExample = `
+include:
+  - text: |
+      backdrops:
+        foo:
+          name: bar
+`
+
+func TestInclude(t *testing.T) {
+	var mapType map[interface{}]interface{}
+	err := yaml.Unmarshal([]byte(includeExample), &mapType)
+	assert.Nil(t, err)
+	ptr, decode := NewConfig()
+	config := *(ptr.(**Config))
+        s := decoder.New("test")
+	decode(s, mapType)
+	assert.Contains(t, config.Backdrops, "foo")
+	assert.Equal(t, "bar", config.Backdrops["foo"].ContainerName)
+}
+
+func getExampleConfig(t *testing.T, yamlConfig string) *types.Backdrop {
 	var mapType map[interface{}]interface{}
 	err := yaml.Unmarshal([]byte(yamlConfig), &mapType)
 	assert.Nil(t, err)
-	decoder := NewDecoder("example")
-	config, err := decoder.DecodeBackdrop("example", mapType)
+        produce := cfgtypes.NewBackdrop()
+	ptr, decode := produce()
+	config := *(ptr.(**types.Backdrop))
+        s := decoder.New("test")
+	decode(s, mapType)
 	assert.Nil(t, err)
 	return config
 }

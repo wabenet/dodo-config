@@ -1,87 +1,43 @@
 package configuration
 
 import (
-	"fmt"
+	"reflect"
 
 	"github.com/dodo/dodo-config/pkg/decoder"
+	cfgtypes "github.com/dodo/dodo-config/pkg/types"
 	"github.com/oclaussen/dodo/pkg/types"
-	"github.com/oclaussen/go-gimme/configfiles"
-	"github.com/sahilm/fuzzy"
-	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 )
 
-func LoadBackdrop(backdrop string) (*types.Backdrop, error) {
-	config := loadConfig()
-	if result, ok := config.Backdrops[backdrop]; ok {
-		return &result, nil
-	}
-
-	matches := fuzzy.Find(backdrop, config.Names())
-	if len(matches) == 0 {
-		return nil, fmt.Errorf("could not find any configuration for backdrop '%s'", backdrop)
-	}
-	return nil, fmt.Errorf("backdrop '%s' not found, did you mean '%s'?", backdrop, matches[0].Str)
+type Config struct {
+	Backdrops map[string]*types.Backdrop
+	Groups    map[string]*Config
 }
 
-func ListBackdrops() []string {
-	return loadConfig().Strings()
+func NewConfig() (interface{}, decoder.Decoder) {
+	target := &Config{Groups: map[string]*Config{}, Backdrops: map[string]*types.Backdrop{}}
+	return &target, decodeConfig(&target)
 }
 
-func ValidateConfigs(files []string) error {
-	// TODO: too much duplication between load and validate
-	errors := 0
-	configfiles.GimmeConfigFiles(&configfiles.Options{
-		FileGlobs:        files,
-		UseFileGlobsOnly: true,
-		Filter: func(configFile *configfiles.ConfigFile) bool {
-			var mapType map[interface{}]interface{}
-			if err := yaml.Unmarshal(configFile.Content, &mapType); err != nil {
-				log.WithFields(log.Fields{"file": configFile.Path}).Error("invalid YAML syntax in file")
-				errors = errors + 1
-				return false
-			}
-
-			decoder := decoder.NewDecoder(configFile.Path)
-			if _, err := decoder.DecodeGroup(configFile.Path, mapType); err != nil {
-				log.WithFields(log.Fields{"file": configFile.Path, "reason": err}).Error("invalid config file")
-				errors = errors + 1
-				return false
-			}
-
-			log.WithFields(log.Fields{"file": configFile.Path}).Info("config file ok")
-			return false
-		},
+func decodeConfig(target interface{}) decoder.Decoder {
+	// TODO: wtf this cast
+	group := *(target.(**Config))
+	dummy := []interface{}{}
+	return decoder.Keys(map[string]decoder.Decoder{
+		"groups":    decoder.Map(NewConfig, &group.Groups),
+		"backdrops": decoder.Map(cfgtypes.NewBackdrop(), &group.Backdrops),
+		"include": decoder.Kinds(map[reflect.Kind]decoder.Decoder{
+			reflect.Map:   decoder.Singleton(newInclude(target), &dummy),
+			reflect.Slice: decoder.Slice(newInclude(target), &dummy),
+		}),
 	})
-	if errors > 0 {
-		return fmt.Errorf("%d errors encountered", errors)
-	}
-	return nil
 }
 
-func loadConfig() *decoder.Group {
-	var result decoder.Group
-	configfiles.GimmeConfigFiles(&configfiles.Options{
-		Name:                      "dodo",
-		Extensions:                []string{"yaml", "yml", "json"},
-		IncludeWorkingDirectories: true,
-		Filter: func(configFile *configfiles.ConfigFile) bool {
-			var mapType map[interface{}]interface{}
-			if err := yaml.Unmarshal(configFile.Content, &mapType); err != nil {
-				log.WithFields(log.Fields{"file": configFile.Path}).Warn("invalid YAML syntax in file")
-				return false
-			}
-
-			decoder := decoder.NewDecoder(configFile.Path)
-			config, err := decoder.DecodeGroup(configFile.Path, mapType)
-			if err != nil {
-				log.WithFields(log.Fields{"file": configFile.Path, "reason": err}).Warn("invalid config file")
-				return false
-			}
-
-			result.Merge(&config)
-			return false
-		},
-	})
-	return &result
+func newInclude(target interface{}) decoder.Producer {
+	return func() (interface{}, decoder.Decoder) {
+		var dummy struct{}
+		return &dummy, decoder.Keys(map[string]decoder.Decoder{
+			"text": decoder.IncludeText(decodeConfig(target)),
+			"file": decoder.IncludeFile(decodeConfig(target)),
+		})
+	}
 }

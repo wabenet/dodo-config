@@ -1,140 +1,140 @@
 package decoder
 
 import (
-	"bytes"
-	"os"
-	"os/exec"
-	"os/user"
-	"path/filepath"
 	"reflect"
-	"text/template"
-
-	"github.com/Masterminds/sprig"
+	"strconv"
 )
 
-type decoder struct {
-	filename string
-}
+type (
+	Decoder  func(*Status, interface{})
+	Producer func() (interface{}, Decoder)
+)
 
-func NewDecoder(filename string) *decoder {
-	return &decoder{filename: filename}
-}
-
-func (d *decoder) WithFile(filename string) *decoder {
-	return &decoder{filename: filename}
-}
-
-func (d *decoder) DecodeBool(name string, config interface{}) (bool, error) {
-	var result bool
-	switch t := reflect.ValueOf(config); t.Kind() {
-	case reflect.Bool:
-		result = t.Bool()
+func Kinds(lookup map[reflect.Kind]Decoder) Decoder {
+	return func(s *Status, config interface{}) {
+		kind := reflect.ValueOf(config).Kind()
+		if decode, ok := lookup[kind]; ok {
+			decode(s, config)
+		} else {
+			s.Error("invalid type")
+		}
 	}
-	return result, nil
 }
 
-func (d *decoder) DecodeInt(name string, config interface{}) (int64, error) {
-	var result int64
-	switch t := reflect.ValueOf(config); t.Kind() {
-	case reflect.Int:
-		result = t.Int()
+func Keys(lookup map[string]Decoder) Decoder {
+	return func(s *Status, config interface{}) {
+		decoded, ok := reflect.ValueOf(config).Interface().(map[interface{}]interface{})
+		if !ok {
+			s.Error("not a map")
+			return
+		}
+		for k, v := range decoded {
+			key := k.(string)
+			if decode, ok := lookup[key]; ok {
+				s.Run(key, decode, v)
+			} else {
+				s.Error("unexpected key")
+			}
+		}
 	}
-	return result, nil
 }
 
-func (d *decoder) DecodeString(name string, config interface{}) (string, error) {
-	var result string
-	switch t := reflect.ValueOf(config); t.Kind() {
-	case reflect.String:
-		return d.ApplyTemplate(t.String())
+func Slice(produce Producer, target interface{}) Decoder {
+	return func(s *Status, config interface{}) {
+		decoded, ok := reflect.ValueOf(config).Interface().([]interface{})
+		if !ok {
+			s.Error("not a slice")
+			return
+		}
+		items := reflect.ValueOf(target).Elem()
+		for i, item := range decoded {
+			ptr, decode := produce()
+			s.Run(strconv.Itoa(i), decode, item)
+			items.Set(reflect.Append(items, reflect.ValueOf(ptr).Elem()))
+		}
 	}
-	return result, nil
 }
 
-func (d *decoder) DecodeStringSlice(name string, config interface{}) ([]string, error) {
-	var result []string
-	switch t := reflect.ValueOf(config); t.Kind() {
-	case reflect.String:
-		decoded, err := d.DecodeString(name, t.String())
+func Singleton(produce Producer, target interface{}) Decoder {
+	return func(s *Status, config interface{}) {
+		items := reflect.ValueOf(target).Elem()
+		ptr, decode := produce()
+		s.Run("", decode, config)
+		items.Set(reflect.Append(items, reflect.ValueOf(ptr).Elem()))
+	}
+}
+
+func Map(produce Producer, target interface{}) Decoder {
+	return func(s *Status, config interface{}) {
+		decoded, ok := reflect.ValueOf(config).Interface().(map[interface{}]interface{})
+		if !ok {
+			s.Error("not a map")
+			return
+		}
+		items := reflect.ValueOf(target).Elem()
+		for key, value := range decoded {
+			ptr, decode := produce()
+			s.Run(key.(string), decode, value)
+			items.SetMapIndex(reflect.ValueOf(key), reflect.ValueOf(ptr).Elem())
+		}
+	}
+}
+
+func String(target interface{}) Decoder {
+	return func(s *Status, config interface{}) {
+		decoded, ok := config.(string)
+		if !ok {
+			s.Error("not a string")
+			return
+		}
+		templated, err := ApplyTemplate(s, decoded)
 		if err != nil {
-			return result, err
+			s.Error("invalid templating")
+			return
 		}
-		result = []string{decoded}
-	case reflect.Slice:
-		for _, v := range t.Interface().([]interface{}) {
-			decoded, err := d.DecodeString(name, v)
-			if err != nil {
-				return result, err
-			}
-			result = append(result, decoded)
+		reflect.ValueOf(target).Elem().SetString(templated)
+	}
+}
+
+func NewString() Producer {
+	return func() (interface{}, Decoder) {
+		var target string
+		return &target, String(&target)
+	}
+}
+
+func Bool(target interface{}) Decoder {
+	return func(s *Status, config interface{}) {
+		decoded, ok := config.(bool)
+		if !ok {
+			s.Error("not a boolean")
+			return
 		}
-	}
-	return result, nil
-}
-
-func (d *decoder) ApplyTemplate(input string) (string, error) {
-	templ, err := template.New("config").Funcs(sprig.TxtFuncMap()).Funcs(d.FuncMap()).Parse(input)
-	if err != nil {
-		return "", err
-	}
-
-	var buffer bytes.Buffer
-	err = templ.Execute(&buffer, *d)
-	if err != nil {
-		return "", err
-	}
-
-	return buffer.String(), nil
-}
-
-func (d *decoder) FuncMap() template.FuncMap {
-	return template.FuncMap{
-		"user": user.Current,
-		"cwd":  os.Getwd,
-		"env":  os.Getenv,
-		"sh":   runShell,
-		"projectRoot": func() (string, error) {
-			root, _, err := findProjectRoot()
-			return root, err
-		},
-		"projectPath": func() (string, error) {
-			_, path, err := findProjectRoot()
-			return path, err
-		},
-		"currentFile": func() string {
-			return d.filename
-		},
-		"currentDir": func() string {
-			return filepath.Dir(d.filename)
-		},
+		reflect.ValueOf(target).Elem().SetBool(decoded)
 	}
 }
 
-func runShell(command string) (string, error) {
-	// TODO: what to do on windows?
-	cmd := exec.Command("/bin/sh", "-c", command)
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	err := cmd.Run()
-	if err != nil {
-		return "", err
+func NewBool() Producer {
+	return func() (interface{}, Decoder) {
+		var target bool
+		return &target, Bool(&target)
 	}
-	return out.String(), nil
 }
 
-func findProjectRoot() (string, string, error) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		return "", "", err
-	}
-	for dir := cwd; dir != "/"; dir = filepath.Dir(dir) {
-		if info, err := os.Stat(filepath.Join(dir, ".git")); err == nil && info.IsDir() {
-			path, err2 := filepath.Rel(dir, cwd)
-			if err2 != nil {
-				return "", "", err
-			}
-			return dir, path, nil
+func Int(target interface{}) Decoder {
+	return func(s *Status, config interface{}) {
+		decoded, ok := config.(int64)
+		if !ok {
+			s.Error("not an integer")
+			return
 		}
+		reflect.ValueOf(target).Elem().SetInt(decoded)
 	}
-	return cwd, ".", nil
+}
+
+func NewInt() Producer {
+	return func() (interface{}, Decoder) {
+		var target int64
+		return &target, Int(&target)
+	}
 }
