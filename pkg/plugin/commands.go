@@ -1,23 +1,11 @@
-package command
+package plugin
 
 import (
-	"fmt"
-
-	"github.com/dodo/dodo-config/pkg/configuration"
 	"github.com/dodo/dodo-config/pkg/decoder"
-	"github.com/oclaussen/dodo/pkg/command"
-	"github.com/oclaussen/dodo/pkg/plugin"
 	"github.com/oclaussen/go-gimme/configfiles"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
-
-func RegisterPlugin() {
-	plugin.RegisterPluginServer(
-		command.PluginType,
-		&command.Plugin{Impl: &Commands{}},
-	)
-}
 
 type Commands struct {
 	cmds map[string]*cobra.Command
@@ -40,7 +28,7 @@ func NewListCommand() *cobra.Command {
 		DisableFlagsInUseLine: true,
 		SilenceUsage:          true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ptr, decode := configuration.NewConfig()
+			ptr, decode := NewConfig()
 			configfiles.GimmeConfigFiles(&configfiles.Options{
 				Name:                      "dodo",
 				Extensions:                []string{"yaml", "yml", "json"},
@@ -48,33 +36,18 @@ func NewListCommand() *cobra.Command {
 				Filter: func(configFile *configfiles.ConfigFile) bool {
 					s := decoder.New(configFile.Path)
 					s.LoadYaml(decode, configFile.Content)
-                                        return false
+					return false
 				},
 			})
 
 			// TODO: wtf this cast
-                        config := *(ptr.(**configuration.Config))
-			list("", config)
-			return nil
-		},
-	}
-}
-
-func list(prefix string, config *configuration.Config) {
-	if config.Backdrops != nil {
-		for name, _ := range config.Backdrops {
-			// TODO filename
-			if len(prefix) > 0 {
-				log.WithFields(log.Fields{"group": prefix}).Info(name)
-			} else {
+			config := *(ptr.(**Config))
+			for name, _ := range config.Backdrops {
+				// TODO filename
 				log.Info(name)
 			}
-		}
-	}
-	if config.Groups != nil {
-		for name, group := range config.Groups {
-			list(fmt.Sprintf("%s/", name), group)
-		}
+			return nil
+		},
 	}
 }
 
@@ -86,7 +59,7 @@ func NewValidateCommand() *cobra.Command {
 		SilenceUsage:          true,
 		Args:                  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_, decode := configuration.NewConfig()
+			_, decode := NewConfig()
 			configfiles.GimmeConfigFiles(&configfiles.Options{
 				FileGlobs:        args,
 				UseFileGlobsOnly: true,
