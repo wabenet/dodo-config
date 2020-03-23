@@ -9,24 +9,24 @@ import (
 )
 
 func NewVolume() decoder.Producer {
-	return func() (interface{}, decoder.Decoder) {
+	return func() (interface{}, decoder.Decoding) {
 		target := &types.Volume{}
-		return &target, Volume(&target)
+		return &target, DecodeVolume(&target)
 	}
 }
 
-func Volume(target interface{}) decoder.Decoder {
+func DecodeVolume(target interface{}) decoder.Decoding {
 	// TODO: wtf this cast
 	vol := *(target.(**types.Volume))
-	return decoder.Kinds(map[reflect.Kind]decoder.Decoder{
-		reflect.Map: decoder.Keys(map[string]decoder.Decoder{
+	return decoder.Kinds(map[reflect.Kind]decoder.Decoding{
+		reflect.Map: decoder.Keys(map[string]decoder.Decoding{
 			"source":    decoder.String(&vol.Source),
 			"target":    decoder.String(&vol.Target),
 			"read_only": decoder.Bool(&vol.Readonly),
 		}),
-		reflect.String: func(s *decoder.Status, config interface{}) {
+		reflect.String: func(d *decoder.Decoder, config interface{}) {
 			var decoded string
-			decoder.String(&decoded)(s, config)
+			decoder.String(&decoded)(d, config)
 			switch values := strings.SplitN(decoded, ":", 3); len(values) {
 			case 1:
 				vol.Source = values[0]
@@ -38,7 +38,7 @@ func Volume(target interface{}) decoder.Decoder {
 				vol.Target = values[1]
 				vol.Readonly = values[2] == "ro"
 			default:
-				s.Error("invalid volume")
+				d.Error("invalid volume")
                                 return
 			}
 		},

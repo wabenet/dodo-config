@@ -1,135 +1,101 @@
 package decoder
 
 import (
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"reflect"
-	"strconv"
+
+	"github.com/pkg/errors"
+	"gopkg.in/yaml.v2"
 )
 
-func Kinds(lookup map[reflect.Kind]Decoder) Decoder {
-	return func(s *Status, config interface{}) {
-		kind := reflect.ValueOf(config).Kind()
-		if decode, ok := lookup[kind]; ok {
-			decode(s, config)
-		} else {
-			s.Error("invalid type")
-		}
+type (
+	Decoding  func(*Decoder, interface{})
+	Producer func() (interface{}, Decoding)
+
+	Decoder struct {
+		file   string
+		path   []string
+		errors []error
+	}
+)
+
+func New(filename string) *Decoder {
+	return &Decoder{
+		file:   filename,
+		path:   []string{},
+		errors: []error{},
 	}
 }
 
-func Keys(lookup map[string]Decoder) Decoder {
-	return func(s *Status, config interface{}) {
-		decoded, ok := reflect.ValueOf(config).Interface().(map[interface{}]interface{})
-		if !ok {
-			s.Error("not a map")
-			return
-		}
-		for k, v := range decoded {
-			key := k.(string)
-			if decode, ok := lookup[key]; ok {
-				s.Run(key, decode, v)
-			} else {
-				s.Error("unexpected key")
-			}
-		}
-	}
+func (d *Decoder) Error(msg string) {
+	// TODO add file and path to error messages
+	d.errors = append(d.errors, errors.New(msg))
 }
 
-func Slice(produce Producer, target interface{}) Decoder {
-	return func(s *Status, config interface{}) {
-		decoded, ok := reflect.ValueOf(config).Interface().([]interface{})
-		if !ok {
-			s.Error("not a slice")
-			return
-		}
-		items := reflect.ValueOf(target).Elem()
-		for i, item := range decoded {
-			ptr, decode := produce()
-			s.Run(strconv.Itoa(i), decode, item)
-			items.Set(reflect.Append(items, reflect.ValueOf(ptr).Elem()))
-		}
-	}
+func (d *Decoder) Errors() []error {
+	return d.errors
 }
 
-func Singleton(produce Producer, target interface{}) Decoder {
-	return func(s *Status, config interface{}) {
-		items := reflect.ValueOf(target).Elem()
-		ptr, decode := produce()
-		s.Run("", decode, config)
-		items.Set(reflect.Append(items, reflect.ValueOf(ptr).Elem()))
-	}
+func (d *Decoder) Run(name string, decode Decoding, value interface{}) {
+	d.path = append(d.path, name)
+	decode(d, value)
+	d.path = d.path[:len(d.path)-1]
 }
 
-func Map(produce Producer, target interface{}) Decoder {
-	return func(s *Status, config interface{}) {
-		decoded, ok := reflect.ValueOf(config).Interface().(map[interface{}]interface{})
-		if !ok {
-			s.Error("not a map")
-			return
-		}
-		items := reflect.ValueOf(target).Elem()
-		for key, value := range decoded {
-			ptr, decode := produce()
-			s.Run(key.(string), decode, value)
-			items.SetMapIndex(reflect.ValueOf(key), reflect.ValueOf(ptr).Elem())
-		}
+func (d *Decoder) DecodeYaml(content []byte, target interface{}, lookup map[string]Decoding) {
+	var mapType map[interface{}]interface{}
+	if err := yaml.Unmarshal(content, &mapType); err != nil {
+		d.Error("invalid yaml")
+		return
 	}
+
+	var dummySlice []struct{}
+	var dummyItem struct{}
+
+	includeHelper := func() (interface{}, Decoding) {
+		return &dummyItem, Keys(map[string]Decoding{
+			"text": func(d *Decoder, config interface{}) {
+				var decoded string
+				String(&decoded)(d, config)
+				d.DecodeYaml([]byte(decoded), target, lookup)
+			},
+			"file": func(d *Decoder, config interface{}) {
+				var decoded string
+				String(&decoded)(d, config)
+
+				bytes, err := readFile(decoded)
+				if err != nil {
+					d.Error("could not read file")
+					return
+				}
+
+				sub := New(decoded)
+				sub.DecodeYaml(bytes, target, lookup)
+				d.errors = append(d.errors, sub.errors...)
+			},
+		})
+	}
+
+	lookup["include"] = Kinds(map[reflect.Kind]Decoding{
+		reflect.Map:   Singleton(includeHelper, &dummySlice),
+		reflect.Slice: Slice(includeHelper, &dummySlice),
+	})
+
+	d.Run("", Keys(lookup), mapType)
 }
 
-func String(target interface{}) Decoder {
-	return func(s *Status, config interface{}) {
-		decoded, ok := config.(string)
-		if !ok {
-			s.Error("not a string")
-			return
-		}
-		templated, err := ApplyTemplate(s, decoded)
+func readFile(filename string) ([]byte, error) {
+	if !filepath.IsAbs(filename) {
+		directory, err := os.Getwd()
 		if err != nil {
-			s.Error("invalid templating")
-			return
+			return []byte{}, err
 		}
-		reflect.ValueOf(target).Elem().SetString(templated)
-	}
-}
-
-func NewString() Producer {
-	return func() (interface{}, Decoder) {
-		var target string
-		return &target, String(&target)
-	}
-}
-
-func Bool(target interface{}) Decoder {
-	return func(s *Status, config interface{}) {
-		decoded, ok := config.(bool)
-		if !ok {
-			s.Error("not a boolean")
-			return
+		filename, err = filepath.Abs(filepath.Join(directory, filename))
+		if err != nil {
+			return []byte{}, err
 		}
-		reflect.ValueOf(target).Elem().SetBool(decoded)
 	}
-}
-
-func NewBool() Producer {
-	return func() (interface{}, Decoder) {
-		var target bool
-		return &target, Bool(&target)
-	}
-}
-
-func Int(target interface{}) Decoder {
-	return func(s *Status, config interface{}) {
-		decoded, ok := config.(int64)
-		if !ok {
-			s.Error("not an integer")
-			return
-		}
-		reflect.ValueOf(target).Elem().SetInt(decoded)
-	}
-}
-
-func NewInt() Producer {
-	return func() (interface{}, Decoder) {
-		var target int64
-		return &target, Int(&target)
-	}
+	return ioutil.ReadFile(filename)
 }

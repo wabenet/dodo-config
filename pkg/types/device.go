@@ -9,25 +9,25 @@ import (
 )
 
 func NewDevice() decoder.Producer {
-	return func() (interface{}, decoder.Decoder) {
+	return func() (interface{}, decoder.Decoding) {
 		target := &types.Device{}
-		return &target, Device(&target)
+		return &target, DecodeDevice(&target)
 	}
 }
 
-func Device(target interface{}) decoder.Decoder {
+func DecodeDevice(target interface{}) decoder.Decoding {
 	// TODO: wtf this cast
 	dev := *(target.(**types.Device))
-	return decoder.Kinds(map[reflect.Kind]decoder.Decoder{
-		reflect.Map: decoder.Keys(map[string]decoder.Decoder{
+	return decoder.Kinds(map[reflect.Kind]decoder.Decoding{
+		reflect.Map: decoder.Keys(map[string]decoder.Decoding{
 			"cgroup_rule": decoder.String(&dev.CgroupRule),
 			"source":      decoder.String(&dev.Source),
 			"target":      decoder.String(&dev.Target),
 			"permissions": decoder.String(&dev.Permissions),
 		}),
-		reflect.String: func(s *decoder.Status, config interface{}) {
+		reflect.String: func(d *decoder.Decoder, config interface{}) {
 			var decoded string
-			decoder.String(&decoded)(s, config)
+			decoder.String(&decoded)(d, config)
 			switch values := strings.SplitN(decoded, ":", 3); len(values) {
 			case 1:
 				dev.Source = values[0]
@@ -39,7 +39,7 @@ func Device(target interface{}) decoder.Decoder {
 				dev.Target = values[1]
 				dev.Permissions = values[2]
 			default:
-				s.Error("invalid device")
+				d.Error("invalid device")
                                 return
 			}
 		},

@@ -110,8 +110,8 @@ include:
 
 func TestInclude(t *testing.T) {
 	backdrops := map[string]*types.Backdrop{}
-	s := decoder.New("test")
-	s.DecodeYaml([]byte(includeExample), &backdrops, map[string]decoder.Decoder{
+	d := decoder.New("test")
+	d.DecodeYaml([]byte(includeExample), &backdrops, map[string]decoder.Decoding{
 		"backdrops": decoder.Map(cfgtypes.NewBackdrop(), &backdrops),
 	})
 	assert.Contains(t, backdrops, "foo")
@@ -119,14 +119,15 @@ func TestInclude(t *testing.T) {
 }
 
 func getExampleConfig(t *testing.T, yamlConfig string) *types.Backdrop {
+	// TODO: clean up this part
 	var mapType map[interface{}]interface{}
 	err := yaml.Unmarshal([]byte(yamlConfig), &mapType)
 	assert.Nil(t, err)
 	produce := cfgtypes.NewBackdrop()
 	ptr, decode := produce()
 	config := *(ptr.(**types.Backdrop))
-	s := decoder.New("test")
-	decode(s, mapType)
+	d := decoder.New("test")
+	decode(d, mapType)
 	assert.Nil(t, err)
 	return config
 }

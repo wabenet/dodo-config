@@ -8,17 +8,17 @@ import (
 )
 
 func NewBackdrop() decoder.Producer {
-	return func() (interface{}, decoder.Decoder) {
+	return func() (interface{}, decoder.Decoding) {
 		target := &types.Backdrop{Entrypoint: &types.Entrypoint{}}
-		return &target, Backdrop(&target)
+		return &target, DecodeBackdrop(&target)
 	}
 }
 
-func Backdrop(target interface{}) decoder.Decoder {
+func DecodeBackdrop(target interface{}) decoder.Decoding {
 	// TODO: wtf this cast
 	backdrop := *(target.(**types.Backdrop))
-	return decoder.Kinds(map[reflect.Kind]decoder.Decoder{
-		reflect.Map: decoder.Keys(map[string]decoder.Decoder{
+	return decoder.Kinds(map[reflect.Kind]decoder.Decoding{
+		reflect.Map: decoder.Keys(map[string]decoder.Decoding{
 			"name":           decoder.String(&backdrop.ContainerName),
 			"alias":          decoder.Slice(decoder.NewString(), &backdrop.Aliases),
 			"aliases":        decoder.Slice(decoder.NewString(), &backdrop.Aliases),
@@ -26,47 +26,47 @@ func Backdrop(target interface{}) decoder.Decoder {
 			"image":          decoder.String(&backdrop.ImageId),
 			"interactive":    decoder.Bool(&backdrop.Entrypoint.Interactive),
 			"script":         decoder.String(&backdrop.Entrypoint.Script),
-			"interpreter": decoder.Kinds(map[reflect.Kind]decoder.Decoder{
+			"interpreter": decoder.Kinds(map[reflect.Kind]decoder.Decoding{
 				reflect.String: decoder.Singleton(decoder.NewString(), &backdrop.Entrypoint.Interpreter),
 				reflect.Slice:  decoder.Slice(decoder.NewString(), &backdrop.Entrypoint.Interpreter),
 			}),
-			"arguments": decoder.Kinds(map[reflect.Kind]decoder.Decoder{
+			"arguments": decoder.Kinds(map[reflect.Kind]decoder.Decoding{
 				reflect.String: decoder.Singleton(decoder.NewString(), &backdrop.Entrypoint.Arguments),
 				reflect.Slice:  decoder.Slice(decoder.NewString(), &backdrop.Entrypoint.Arguments),
 			}),
-			"command": decoder.Kinds(map[reflect.Kind]decoder.Decoder{
+			"command": decoder.Kinds(map[reflect.Kind]decoder.Decoding{
 				reflect.String: decoder.Singleton(decoder.NewString(), &backdrop.Entrypoint.Arguments),
 				reflect.Slice:  decoder.Slice(decoder.NewString(), &backdrop.Entrypoint.Arguments),
 			}),
-			"env": decoder.Kinds(map[reflect.Kind]decoder.Decoder{
+			"env": decoder.Kinds(map[reflect.Kind]decoder.Decoding{
 				reflect.String: decoder.Singleton(NewEnvironment(), &backdrop.Environment),
 				reflect.Slice:  decoder.Slice(NewEnvironment(), &backdrop.Environment),
 			}),
-			"environment": decoder.Kinds(map[reflect.Kind]decoder.Decoder{
+			"environment": decoder.Kinds(map[reflect.Kind]decoder.Decoding{
 				reflect.String: decoder.Singleton(NewEnvironment(), &backdrop.Environment),
 				reflect.Slice:  decoder.Slice(NewEnvironment(), &backdrop.Environment),
 			}),
-			"volume": decoder.Kinds(map[reflect.Kind]decoder.Decoder{
+			"volume": decoder.Kinds(map[reflect.Kind]decoder.Decoding{
 				reflect.String: decoder.Singleton(NewVolume(), &backdrop.Volumes),
 				reflect.Map:    decoder.Singleton(NewVolume(), &backdrop.Volumes),
 				reflect.Slice:  decoder.Slice(NewVolume(), &backdrop.Volumes),
 			}),
-			"volumes": decoder.Kinds(map[reflect.Kind]decoder.Decoder{
+			"volumes": decoder.Kinds(map[reflect.Kind]decoder.Decoding{
 				reflect.String: decoder.Singleton(NewVolume(), &backdrop.Volumes),
 				reflect.Map:    decoder.Singleton(NewVolume(), &backdrop.Volumes),
 				reflect.Slice:  decoder.Slice(NewVolume(), &backdrop.Volumes),
 			}),
-			"device": decoder.Kinds(map[reflect.Kind]decoder.Decoder{
+			"device": decoder.Kinds(map[reflect.Kind]decoder.Decoding{
 				reflect.String: decoder.Singleton(NewDevice(), &backdrop.Devices),
 				reflect.Map:    decoder.Singleton(NewDevice(), &backdrop.Devices),
 				reflect.Slice:  decoder.Slice(NewDevice(), &backdrop.Devices),
 			}),
-			"devices": decoder.Kinds(map[reflect.Kind]decoder.Decoder{
+			"devices": decoder.Kinds(map[reflect.Kind]decoder.Decoding{
 				reflect.String: decoder.Singleton(NewDevice(), &backdrop.Devices),
 				reflect.Map:    decoder.Singleton(NewDevice(), &backdrop.Devices),
 				reflect.Slice:  decoder.Slice(NewDevice(), &backdrop.Devices),
 			}),
-			"ports": decoder.Kinds(map[reflect.Kind]decoder.Decoder{
+			"ports": decoder.Kinds(map[reflect.Kind]decoder.Decoding{
 				reflect.String: decoder.Singleton(NewPort(), &backdrop.Ports),
 				reflect.Map:    decoder.Singleton(NewPort(), &backdrop.Ports),
 				reflect.Slice:  decoder.Slice(NewPort(), &backdrop.Ports),

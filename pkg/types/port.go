@@ -9,25 +9,25 @@ import (
 )
 
 func NewPort() decoder.Producer {
-	return func() (interface{}, decoder.Decoder) {
+	return func() (interface{}, decoder.Decoding) {
 		target := &types.Port{}
-		return &target, Port(&target)
+		return &target, DecodePort(&target)
 	}
 }
 
-func Port(target interface{}) decoder.Decoder {
+func DecodePort(target interface{}) decoder.Decoding {
 	// TODO: wtf this cast
 	port := *(target.(**types.Port))
-	return decoder.Kinds(map[reflect.Kind]decoder.Decoder{
-		reflect.Map: decoder.Keys(map[string]decoder.Decoder{
+	return decoder.Kinds(map[reflect.Kind]decoder.Decoding{
+		reflect.Map: decoder.Keys(map[string]decoder.Decoding{
 			"target":    decoder.String(&port.Target),
 			"published": decoder.String(&port.Published),
 			"protocol":  decoder.String(&port.Protocol),
 			"host_ip":   decoder.String(&port.HostIp),
 		}),
-		reflect.String: func(s *decoder.Status, config interface{}) {
+		reflect.String: func(d *decoder.Decoder, config interface{}) {
 			var decoded string
-			decoder.String(&decoded)(s, config)
+			decoder.String(&decoded)(d, config)
 			switch values := strings.SplitN(decoded, ":", 3); len(values) {
 			case 1:
 				port.Target = values[0]
@@ -39,7 +39,7 @@ func Port(target interface{}) decoder.Decoder {
 				port.Published = values[1]
 				port.Target = values[2]
 			default:
-				s.Error("invalid port definition")
+				d.Error("invalid port definition")
                                 return
 			}
 			switch values := strings.SplitN(port.Target, "/", 2); len(values) {
@@ -49,7 +49,7 @@ func Port(target interface{}) decoder.Decoder {
 				port.Target = values[0]
 				port.Protocol = values[1]
 			default:
-				s.Error("invalid port definition")
+				d.Error("invalid port definition")
                                 return
 			}
 		},

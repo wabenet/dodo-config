@@ -9,18 +9,18 @@ import (
 )
 
 func NewEnvironment() decoder.Producer {
-	return func() (interface{}, decoder.Decoder) {
+	return func() (interface{}, decoder.Decoding) {
 		target := &types.Environment{}
-		return &target, Environment(&target)
+		return &target, DecodeEnvironment(&target)
 	}
 }
 
-func Environment(target interface{}) decoder.Decoder {
+func DecodeEnvironment(target interface{}) decoder.Decoding {
 	// TODO: wtf this cast
 	env := *(target.(**types.Environment))
-	return func(s *decoder.Status, config interface{}) {
+	return func(d *decoder.Decoder, config interface{}) {
 		var decoded string
-		decoder.String(&decoded)(s, config)
+		decoder.String(&decoded)(d, config)
 		switch values := strings.SplitN(decoded, "=", 2); len(values) {
 		case 1:
 			env.Key = values[0]
@@ -29,7 +29,7 @@ func Environment(target interface{}) decoder.Decoder {
 			env.Key = values[0]
 			env.Value = values[1]
 		default:
-			s.Error("invalid environment")
+			d.Error("invalid environment")
 		}
 	}
 }

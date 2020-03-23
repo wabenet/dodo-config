@@ -11,8 +11,8 @@ import (
 	"github.com/Masterminds/sprig"
 )
 
-func ApplyTemplate(s *Status, input string) (string, error) {
-	templ, err := template.New("config").Funcs(sprig.TxtFuncMap()).Funcs(FuncMap(s)).Parse(input)
+func ApplyTemplate(d *Decoder, input string) (string, error) {
+	templ, err := template.New("config").Funcs(sprig.TxtFuncMap()).Funcs(FuncMap(d)).Parse(input)
 	if err != nil {
 		return "", err
 	}
@@ -26,7 +26,7 @@ func ApplyTemplate(s *Status, input string) (string, error) {
 	return buffer.String(), nil
 }
 
-func FuncMap(s *Status) template.FuncMap {
+func FuncMap(d *Decoder) template.FuncMap {
 	return template.FuncMap{
 		"user": user.Current,
 		"cwd":  os.Getwd,
@@ -41,10 +41,10 @@ func FuncMap(s *Status) template.FuncMap {
 			return path, err
 		},
 		"currentFile": func() string {
-			return s.file
+			return d.file
 		},
 		"currentDir": func() string {
-			return filepath.Dir(s.file)
+			return filepath.Dir(d.file)
 		},
 	}
 }

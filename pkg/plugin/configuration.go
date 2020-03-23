@@ -24,8 +24,8 @@ func (p *Configuration) UpdateConfiguration(backdrop *types.Backdrop) (*types.Ba
 		Extensions:                []string{"yaml", "yml", "json"},
 		IncludeWorkingDirectories: true,
 		Filter: func(configFile *configfiles.ConfigFile) bool {
-			s := decoder.New(configFile.Path)
-			s.DecodeYaml(configFile.Content, &backdrops, map[string]decoder.Decoder{
+			d := decoder.New(configFile.Path)
+			d.DecodeYaml(configFile.Content, &backdrops, map[string]decoder.Decoding{
 				"backdrops": decoder.Map(cfgtypes.NewBackdrop(), &backdrops),
 			})
 			return false
