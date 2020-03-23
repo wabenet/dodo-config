@@ -3,8 +3,8 @@ package plugin
 import (
 	"testing"
 
-	cfgtypes "github.com/dodo/dodo-config/pkg/types"
 	"github.com/dodo/dodo-config/pkg/decoder"
+	cfgtypes "github.com/dodo/dodo-config/pkg/types"
 	"github.com/oclaussen/dodo/pkg/types"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
@@ -109,25 +109,23 @@ include:
 `
 
 func TestInclude(t *testing.T) {
-	var mapType map[interface{}]interface{}
-	err := yaml.Unmarshal([]byte(includeExample), &mapType)
-	assert.Nil(t, err)
-	ptr, decode := NewConfig()
-	config := *(ptr.(**Config))
-        s := decoder.New("test")
-	decode(s, mapType)
-	assert.Contains(t, config.Backdrops, "foo")
-	assert.Equal(t, "bar", config.Backdrops["foo"].ContainerName)
+	backdrops := map[string]*types.Backdrop{}
+	s := decoder.New("test")
+	s.DecodeYaml([]byte(includeExample), &backdrops, map[string]decoder.Decoder{
+		"backdrops": decoder.Map(cfgtypes.NewBackdrop(), &backdrops),
+	})
+	assert.Contains(t, backdrops, "foo")
+	assert.Equal(t, "bar", backdrops["foo"].ContainerName)
 }
 
 func getExampleConfig(t *testing.T, yamlConfig string) *types.Backdrop {
 	var mapType map[interface{}]interface{}
 	err := yaml.Unmarshal([]byte(yamlConfig), &mapType)
 	assert.Nil(t, err)
-        produce := cfgtypes.NewBackdrop()
+	produce := cfgtypes.NewBackdrop()
 	ptr, decode := produce()
 	config := *(ptr.(**types.Backdrop))
-        s := decoder.New("test")
+	s := decoder.New("test")
 	decode(s, mapType)
 	assert.Nil(t, err)
 	return config

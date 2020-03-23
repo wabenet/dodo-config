@@ -2,6 +2,8 @@ package plugin
 
 import (
 	"github.com/dodo/dodo-config/pkg/decoder"
+	cfgtypes "github.com/dodo/dodo-config/pkg/types"
+	"github.com/oclaussen/dodo/pkg/types"
 	"github.com/oclaussen/go-gimme/configfiles"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -28,21 +30,21 @@ func NewListCommand() *cobra.Command {
 		DisableFlagsInUseLine: true,
 		SilenceUsage:          true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ptr, decode := NewConfig()
+			backdrops := map[string]*types.Backdrop{}
 			configfiles.GimmeConfigFiles(&configfiles.Options{
 				Name:                      "dodo",
 				Extensions:                []string{"yaml", "yml", "json"},
 				IncludeWorkingDirectories: true,
 				Filter: func(configFile *configfiles.ConfigFile) bool {
 					s := decoder.New(configFile.Path)
-					s.LoadYaml(decode, configFile.Content)
+					s.DecodeYaml(configFile.Content, &backdrops, map[string]decoder.Decoder{
+						"backdrops": decoder.Map(cfgtypes.NewBackdrop(), &backdrops),
+					})
 					return false
 				},
 			})
 
-			// TODO: wtf this cast
-			config := *(ptr.(**Config))
-			for name, _ := range config.Backdrops {
+			for name, _ := range backdrops {
 				// TODO filename
 				log.Info(name)
 			}
@@ -59,13 +61,15 @@ func NewValidateCommand() *cobra.Command {
 		SilenceUsage:          true,
 		Args:                  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_, decode := NewConfig()
+			backdrops := map[string]*types.Backdrop{}
 			configfiles.GimmeConfigFiles(&configfiles.Options{
 				FileGlobs:        args,
 				UseFileGlobsOnly: true,
 				Filter: func(configFile *configfiles.ConfigFile) bool {
 					s := decoder.New(configFile.Path)
-					s.LoadYaml(decode, configFile.Content)
+					s.DecodeYaml(configFile.Content, &backdrops, map[string]decoder.Decoder{
+						"backdrops": decoder.Map(cfgtypes.NewBackdrop(), &backdrops),
+					})
 					for _, err := range s.Errors() {
 						log.Warn(err)
 					}

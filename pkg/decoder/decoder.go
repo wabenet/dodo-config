@@ -5,11 +5,6 @@ import (
 	"strconv"
 )
 
-type (
-	Decoder  func(*Status, interface{})
-	Producer func() (interface{}, Decoder)
-)
-
 func Kinds(lookup map[reflect.Kind]Decoder) Decoder {
 	return func(s *Status, config interface{}) {
 		kind := reflect.ValueOf(config).Kind()
