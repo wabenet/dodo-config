@@ -1,26 +1,22 @@
-package plugin
+package command
 
 import (
-	"github.com/dodo/dodo-config/pkg/decoder"
-	cfgtypes "github.com/dodo/dodo-config/pkg/types"
+	"github.com/oclaussen/dodo/pkg/decoder"
 	"github.com/oclaussen/dodo/pkg/types"
 	"github.com/oclaussen/go-gimme/configfiles"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-type Commands struct {
-	cmds map[string]*cobra.Command
-}
-
-func (p *Commands) GetCommands() (map[string]*cobra.Command, error) {
-	if len(p.cmds) == 0 {
-		p.cmds = map[string]*cobra.Command{
-			"list":     NewListCommand(),
-			"validate": NewValidateCommand(),
-		}
+func NewCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "config",
+		Short: "Config plugin sub commands",
 	}
-	return p.cmds, nil
+
+	cmd.AddCommand(NewListCommand())
+	cmd.AddCommand(NewValidateCommand())
+	return cmd
 }
 
 func NewListCommand() *cobra.Command {
@@ -38,7 +34,7 @@ func NewListCommand() *cobra.Command {
 				Filter: func(configFile *configfiles.ConfigFile) bool {
 					d := decoder.New(configFile.Path)
 					d.DecodeYaml(configFile.Content, &backdrops, map[string]decoder.Decoding{
-						"backdrops": decoder.Map(cfgtypes.NewBackdrop(), &backdrops),
+						"backdrops": decoder.Map(types.NewBackdrop(), &backdrops),
 					})
 					return false
 				},
@@ -68,7 +64,7 @@ func NewValidateCommand() *cobra.Command {
 				Filter: func(configFile *configfiles.ConfigFile) bool {
 					d := decoder.New(configFile.Path)
 					d.DecodeYaml(configFile.Content, &backdrops, map[string]decoder.Decoding{
-						"backdrops": decoder.Map(cfgtypes.NewBackdrop(), &backdrops),
+						"backdrops": decoder.Map(types.NewBackdrop(), &backdrops),
 					})
 					for _, err := range d.Errors() {
 						log.Warn(err)

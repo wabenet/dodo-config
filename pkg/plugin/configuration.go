@@ -3,9 +3,9 @@ package plugin
 import (
 	"fmt"
 
-	"github.com/dodo/dodo-config/pkg/decoder"
-	cfgtypes "github.com/dodo/dodo-config/pkg/types"
 	"github.com/oclaussen/dodo/pkg/configuration"
+	"github.com/oclaussen/dodo/pkg/decoder"
+	"github.com/oclaussen/dodo/pkg/plugin"
 	"github.com/oclaussen/dodo/pkg/types"
 	"github.com/oclaussen/go-gimme/configfiles"
 	"github.com/sahilm/fuzzy"
@@ -13,8 +13,15 @@ import (
 
 type Configuration struct{}
 
-func (p *Configuration) GetClientOptions(_ string) (*configuration.ClientOptions, error) {
-	return &configuration.ClientOptions{}, nil
+func RegisterPlugin() {
+	plugin.RegisterPluginServer(
+		configuration.PluginType,
+		&configuration.Plugin{Impl: &Configuration{}},
+	)
+}
+
+func (p *Configuration) Init() error {
+	return nil
 }
 
 func (p *Configuration) UpdateConfiguration(backdrop *types.Backdrop) (*types.Backdrop, error) {
@@ -26,7 +33,7 @@ func (p *Configuration) UpdateConfiguration(backdrop *types.Backdrop) (*types.Ba
 		Filter: func(configFile *configfiles.ConfigFile) bool {
 			d := decoder.New(configFile.Path)
 			d.DecodeYaml(configFile.Content, &backdrops, map[string]decoder.Decoding{
-				"backdrops": decoder.Map(cfgtypes.NewBackdrop(), &backdrops),
+				"backdrops": decoder.Map(types.NewBackdrop(), &backdrops),
 			})
 			return false
 		},
@@ -41,7 +48,6 @@ func (p *Configuration) UpdateConfiguration(backdrop *types.Backdrop) (*types.Ba
 		names = append(names, name)
 	}
 
-	// TODO: this will be ignored by the plugin client
 	matches := fuzzy.Find(backdrop.Name, names)
 	if len(matches) == 0 {
 		return nil, fmt.Errorf("could not find any configuration for backdrop '%s'", backdrop.Name)

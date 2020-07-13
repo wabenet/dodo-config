@@ -3,8 +3,7 @@ package plugin
 import (
 	"testing"
 
-	"github.com/dodo/dodo-config/pkg/decoder"
-	cfgtypes "github.com/dodo/dodo-config/pkg/types"
+	"github.com/oclaussen/dodo/pkg/decoder"
 	"github.com/oclaussen/dodo/pkg/types"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
@@ -112,7 +111,7 @@ func TestInclude(t *testing.T) {
 	backdrops := map[string]*types.Backdrop{}
 	d := decoder.New("test")
 	d.DecodeYaml([]byte(includeExample), &backdrops, map[string]decoder.Decoding{
-		"backdrops": decoder.Map(cfgtypes.NewBackdrop(), &backdrops),
+		"backdrops": decoder.Map(types.NewBackdrop(), &backdrops),
 	})
 	assert.Contains(t, backdrops, "foo")
 	assert.Equal(t, "bar", backdrops["foo"].ContainerName)
@@ -123,7 +122,7 @@ func getExampleConfig(t *testing.T, yamlConfig string) *types.Backdrop {
 	var mapType map[interface{}]interface{}
 	err := yaml.Unmarshal([]byte(yamlConfig), &mapType)
 	assert.Nil(t, err)
-	produce := cfgtypes.NewBackdrop()
+	produce := types.NewBackdrop()
 	ptr, decode := produce()
 	config := *(ptr.(**types.Backdrop))
 	d := decoder.New("test")
