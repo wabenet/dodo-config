@@ -1,10 +1,12 @@
 package command
 
 import (
+	"fmt"
+
+	log "github.com/hashicorp/go-hclog"
 	"github.com/oclaussen/dodo/pkg/decoder"
 	"github.com/oclaussen/dodo/pkg/types"
 	"github.com/oclaussen/go-gimme/configfiles"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -16,6 +18,7 @@ func NewCommand() *cobra.Command {
 
 	cmd.AddCommand(NewListCommand())
 	cmd.AddCommand(NewValidateCommand())
+
 	return cmd
 }
 
@@ -27,7 +30,7 @@ func NewListCommand() *cobra.Command {
 		SilenceUsage:          true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			backdrops := map[string]*types.Backdrop{}
-			configfiles.GimmeConfigFiles(&configfiles.Options{
+			_, err := configfiles.GimmeConfigFiles(&configfiles.Options{
 				Name:                      "dodo",
 				Extensions:                []string{"yaml", "yml", "json"},
 				IncludeWorkingDirectories: true,
@@ -36,14 +39,20 @@ func NewListCommand() *cobra.Command {
 					d.DecodeYaml(configFile.Content, &backdrops, map[string]decoder.Decoding{
 						"backdrops": decoder.Map(types.NewBackdrop(), &backdrops),
 					})
+
 					return false
 				},
 			})
 
-			for name, _ := range backdrops {
-				// TODO filename
-				log.Info(name)
+			if err != nil {
+				log.L().Error("error finding config files", "error", err)
 			}
+
+			for name := range backdrops {
+				// TODO filename
+				fmt.Println(name)
+			}
+
 			return nil
 		},
 	}
@@ -58,7 +67,7 @@ func NewValidateCommand() *cobra.Command {
 		Args:                  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			backdrops := map[string]*types.Backdrop{}
-			configfiles.GimmeConfigFiles(&configfiles.Options{
+			_, err := configfiles.GimmeConfigFiles(&configfiles.Options{
 				FileGlobs:        args,
 				UseFileGlobsOnly: true,
 				Filter: func(configFile *configfiles.ConfigFile) bool {
@@ -66,12 +75,19 @@ func NewValidateCommand() *cobra.Command {
 					d.DecodeYaml(configFile.Content, &backdrops, map[string]decoder.Decoding{
 						"backdrops": decoder.Map(types.NewBackdrop(), &backdrops),
 					})
+
 					for _, err := range d.Errors() {
-						log.Warn(err)
+						fmt.Println(err)
 					}
+
 					return false
 				},
 			})
+
+			if err != nil {
+				log.L().Error("error finding config files", "error", err)
+			}
+
 			return nil
 		},
 	}

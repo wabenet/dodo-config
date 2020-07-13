@@ -3,6 +3,7 @@ package plugin
 import (
 	"fmt"
 
+	log "github.com/hashicorp/go-hclog"
 	"github.com/oclaussen/dodo/pkg/configuration"
 	"github.com/oclaussen/dodo/pkg/decoder"
 	"github.com/oclaussen/dodo/pkg/plugin"
@@ -26,7 +27,7 @@ func (p *Configuration) Init() error {
 
 func (p *Configuration) UpdateConfiguration(backdrop *types.Backdrop) (*types.Backdrop, error) {
 	backdrops := map[string]*types.Backdrop{}
-	configfiles.GimmeConfigFiles(&configfiles.Options{
+	_, err := configfiles.GimmeConfigFiles(&configfiles.Options{
 		Name:                      "dodo",
 		Extensions:                []string{"yaml", "yml", "json"},
 		IncludeWorkingDirectories: true,
@@ -35,15 +36,20 @@ func (p *Configuration) UpdateConfiguration(backdrop *types.Backdrop) (*types.Ba
 			d.DecodeYaml(configFile.Content, &backdrops, map[string]decoder.Decoding{
 				"backdrops": decoder.Map(types.NewBackdrop(), &backdrops),
 			})
+
 			return false
 		},
 	})
+
+	if err != nil {
+		log.L().Error("error finding config files", "error", err)
+	}
 
 	if result, ok := backdrops[backdrop.Name]; ok {
 		return result, nil
 	}
 
-	var names []string
+	names := []string{}
 	for name := range backdrops {
 		names = append(names, name)
 	}

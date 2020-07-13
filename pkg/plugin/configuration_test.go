@@ -1,4 +1,4 @@
-package plugin
+package plugin_test
 
 import (
 	"testing"
@@ -122,11 +122,13 @@ func getExampleConfig(t *testing.T, yamlConfig string) *types.Backdrop {
 	var mapType map[interface{}]interface{}
 	err := yaml.Unmarshal([]byte(yamlConfig), &mapType)
 	assert.Nil(t, err)
+
 	produce := types.NewBackdrop()
 	ptr, decode := produce()
 	config := *(ptr.(**types.Backdrop))
 	d := decoder.New("test")
 	decode(d, mapType)
 	assert.Nil(t, err)
+
 	return config
 }
