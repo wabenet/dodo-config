@@ -3,7 +3,6 @@ package command
 import (
 	"fmt"
 
-	log "github.com/hashicorp/go-hclog"
 	"github.com/oclaussen/dodo/pkg/decoder"
 	"github.com/oclaussen/dodo/pkg/types"
 	"github.com/oclaussen/go-gimme/configfiles"
@@ -13,7 +12,7 @@ import (
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "config",
-		Short: "Config plugin sub commands",
+		Short: "Config plugin subcommands",
 	}
 
 	cmd.AddCommand(NewListCommand())
@@ -30,7 +29,7 @@ func NewListCommand() *cobra.Command {
 		SilenceUsage:          true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			backdrops := map[string]*types.Backdrop{}
-			_, err := configfiles.GimmeConfigFiles(&configfiles.Options{
+			configfiles.GimmeConfigFiles(&configfiles.Options{
 				Name:                      "dodo",
 				Extensions:                []string{"yaml", "yml", "json"},
 				IncludeWorkingDirectories: true,
@@ -43,10 +42,6 @@ func NewListCommand() *cobra.Command {
 					return false
 				},
 			})
-
-			if err != nil {
-				log.L().Error("error finding config files", "error", err)
-			}
 
 			for name := range backdrops {
 				// TODO filename
@@ -67,7 +62,7 @@ func NewValidateCommand() *cobra.Command {
 		Args:                  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			backdrops := map[string]*types.Backdrop{}
-			_, err := configfiles.GimmeConfigFiles(&configfiles.Options{
+			configfiles.GimmeConfigFiles(&configfiles.Options{
 				FileGlobs:        args,
 				UseFileGlobsOnly: true,
 				Filter: func(configFile *configfiles.ConfigFile) bool {
@@ -83,10 +78,6 @@ func NewValidateCommand() *cobra.Command {
 					return false
 				},
 			})
-
-			if err != nil {
-				log.L().Error("error finding config files", "error", err)
-			}
 
 			return nil
 		},

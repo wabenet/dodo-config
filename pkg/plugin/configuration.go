@@ -3,10 +3,9 @@ package plugin
 import (
 	"fmt"
 
-	log "github.com/hashicorp/go-hclog"
-	"github.com/oclaussen/dodo/pkg/configuration"
 	"github.com/oclaussen/dodo/pkg/decoder"
 	"github.com/oclaussen/dodo/pkg/plugin"
+	"github.com/oclaussen/dodo/pkg/plugin/configuration"
 	"github.com/oclaussen/dodo/pkg/types"
 	"github.com/oclaussen/go-gimme/configfiles"
 	"github.com/sahilm/fuzzy"
@@ -14,11 +13,8 @@ import (
 
 type Configuration struct{}
 
-func RegisterPlugin() {
-	plugin.RegisterPluginServer(
-		configuration.PluginType,
-		&configuration.Plugin{Impl: &Configuration{}},
-	)
+func (p *Configuration) Type() plugin.Type {
+	return configuration.Type
 }
 
 func (p *Configuration) Init() error {
@@ -27,7 +23,7 @@ func (p *Configuration) Init() error {
 
 func (p *Configuration) UpdateConfiguration(backdrop *types.Backdrop) (*types.Backdrop, error) {
 	backdrops := map[string]*types.Backdrop{}
-	_, err := configfiles.GimmeConfigFiles(&configfiles.Options{
+	configfiles.GimmeConfigFiles(&configfiles.Options{
 		Name:                      "dodo",
 		Extensions:                []string{"yaml", "yml", "json"},
 		IncludeWorkingDirectories: true,
@@ -40,10 +36,6 @@ func (p *Configuration) UpdateConfiguration(backdrop *types.Backdrop) (*types.Ba
 			return false
 		},
 	})
-
-	if err != nil {
-		log.L().Error("error finding config files", "error", err)
-	}
 
 	if result, ok := backdrops[backdrop.Name]; ok {
 		return result, nil
