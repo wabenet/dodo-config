@@ -3,10 +3,10 @@ package plugin
 import (
 	"fmt"
 
-	"github.com/oclaussen/dodo/pkg/decoder"
-	"github.com/oclaussen/dodo/pkg/plugin"
-	"github.com/oclaussen/dodo/pkg/plugin/configuration"
-	"github.com/oclaussen/dodo/pkg/types"
+	"github.com/dodo/dodo-core/pkg/decoder"
+	"github.com/dodo/dodo-core/pkg/plugin"
+	"github.com/dodo/dodo-core/pkg/plugin/configuration"
+	"github.com/dodo/dodo-core/pkg/types"
 	"github.com/oclaussen/go-gimme/configfiles"
 	"github.com/sahilm/fuzzy"
 )

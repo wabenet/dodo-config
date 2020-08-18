@@ -5,9 +5,9 @@ import (
 
 	"github.com/dodo/dodo-config/pkg/command"
 	config "github.com/dodo/dodo-config/pkg/plugin"
+	"github.com/dodo/dodo-core/pkg/appconfig"
+	dodo "github.com/dodo/dodo-core/pkg/plugin"
 	log "github.com/hashicorp/go-hclog"
-	"github.com/oclaussen/dodo/pkg/appconfig"
-	dodo "github.com/oclaussen/dodo/pkg/plugin"
 )
 
 func main() {

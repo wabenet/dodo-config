@@ -3,15 +3,40 @@ package command
 import (
 	"fmt"
 
-	"github.com/oclaussen/dodo/pkg/decoder"
-	"github.com/oclaussen/dodo/pkg/types"
+	"github.com/dodo/dodo-core/pkg/decoder"
+	"github.com/dodo/dodo-core/pkg/plugin"
+	"github.com/dodo/dodo-core/pkg/plugin/command"
+	"github.com/dodo/dodo-core/pkg/types"
 	"github.com/oclaussen/go-gimme/configfiles"
 	"github.com/spf13/cobra"
 )
 
+const name = "config"
+
+type Command struct {
+	cmd *cobra.Command
+}
+
+func (p *Command) Type() plugin.Type {
+	return command.Type
+}
+
+func (p *Command) Init() error {
+	p.cmd = NewCommand()
+	return nil
+}
+
+func (p *Command) Name() string {
+	return name
+}
+
+func (p *Command) GetCobraCommand() *cobra.Command {
+	return p.cmd
+}
+
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "config",
+		Use:   name,
 		Short: "Config plugin subcommands",
 	}
 

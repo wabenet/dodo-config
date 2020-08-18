@@ -3,8 +3,8 @@ package plugin_test
 import (
 	"testing"
 
-	"github.com/oclaussen/dodo/pkg/decoder"
-	"github.com/oclaussen/dodo/pkg/types"
+	"github.com/dodo/dodo-core/pkg/decoder"
+	"github.com/dodo/dodo-core/pkg/types"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
 )
