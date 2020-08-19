@@ -3,10 +3,10 @@ package main
 import (
 	"os"
 
-	"github.com/dodo/dodo-config/pkg/command"
-	config "github.com/dodo/dodo-config/pkg/plugin"
-	"github.com/dodo/dodo-core/pkg/appconfig"
-	dodo "github.com/dodo/dodo-core/pkg/plugin"
+	"github.com/dodo-cli/dodo-config/pkg/command"
+	config "github.com/dodo-cli/dodo-config/pkg/plugin"
+	"github.com/dodo-cli/dodo-core/pkg/appconfig"
+	dodo "github.com/dodo-cli/dodo-core/pkg/plugin"
 	log "github.com/hashicorp/go-hclog"
 )
 

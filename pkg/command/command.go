@@ -3,10 +3,10 @@ package command
 import (
 	"fmt"
 
-	"github.com/dodo/dodo-core/pkg/decoder"
-	"github.com/dodo/dodo-core/pkg/plugin"
-	"github.com/dodo/dodo-core/pkg/plugin/command"
-	"github.com/dodo/dodo-core/pkg/types"
+	"github.com/dodo-cli/dodo-core/pkg/decoder"
+	"github.com/dodo-cli/dodo-core/pkg/plugin"
+	"github.com/dodo-cli/dodo-core/pkg/plugin/command"
+	"github.com/dodo-cli/dodo-core/pkg/types"
 	"github.com/oclaussen/go-gimme/configfiles"
 	"github.com/spf13/cobra"
 )
