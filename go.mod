@@ -3,7 +3,7 @@ module github.com/dodo-cli/dodo-config
 go 1.14
 
 require (
-	github.com/dodo-cli/dodo-core v0.0.0-20200819130315-3913e164603d
+	github.com/dodo-cli/dodo-core v0.0.0-20200821135148-cb332de21be2
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/hashicorp/go-hclog v0.14.1
 	github.com/kylelemons/godebug v1.1.0 // indirect
