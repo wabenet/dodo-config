@@ -37,7 +37,7 @@ func (p *Configuration) UpdateConfiguration(backdrop *types.Backdrop) (*types.Ba
 		},
 	})
 
-	if result, ok := backdrops[backdrop.Name]; ok {
+	if result, err := findBackdrop(backdrops, backdrop.Name); err == nil {
 		return result, nil
 	}
 
@@ -51,6 +51,22 @@ func (p *Configuration) UpdateConfiguration(backdrop *types.Backdrop) (*types.Ba
 		return nil, fmt.Errorf("could not find any configuration for backdrop '%s'", backdrop.Name)
 	}
 	return nil, fmt.Errorf("backdrop '%s' not found, did you mean '%s'?", backdrop.Name, matches[0].Str)
+}
+
+func findBackdrop(backdrops map[string]*types.Backdrop, name string) (*types.Backdrop, error) {
+	if result, ok := backdrops[name]; ok {
+		return result, nil
+	}
+
+	for _, b := range backdrops {
+		for _, a := range b.Aliases {
+			if a == name {
+				return b, nil
+			}
+		}
+	}
+
+	return nil, fmt.Errorf("could not find any configuration for backdrop '%s'", name)
 }
 
 func (p *Configuration) Provision(_ string) error {
