@@ -1,6 +1,6 @@
 module github.com/dodo-cli/dodo-config
 
-go 1.14
+go 1.15
 
 require (
 	github.com/dodo-cli/dodo-core v0.0.0-20200821135148-cb332de21be2
