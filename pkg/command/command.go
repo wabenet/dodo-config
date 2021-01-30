@@ -3,6 +3,7 @@ package command
 import (
 	"fmt"
 
+	api "github.com/dodo-cli/dodo-core/api/v1alpha1"
 	"github.com/dodo-cli/dodo-core/pkg/decoder"
 	"github.com/dodo-cli/dodo-core/pkg/plugin"
 	"github.com/dodo-cli/dodo-core/pkg/plugin/command"
@@ -12,6 +13,8 @@ import (
 )
 
 const name = "config"
+
+var _ command.Command = &Command{}
 
 type Command struct {
 	cmd *cobra.Command
@@ -26,8 +29,8 @@ func (p *Command) Init() error {
 	return nil
 }
 
-func (p *Command) Name() string {
-	return name
+func (p *Command) PluginInfo() (*api.PluginInfo, error) {
+	return &api.PluginInfo{Name: name}, nil
 }
 
 func (p *Command) GetCobraCommand() *cobra.Command {
@@ -53,7 +56,7 @@ func NewListCommand() *cobra.Command {
 		DisableFlagsInUseLine: true,
 		SilenceUsage:          true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			backdrops := map[string]*types.Backdrop{}
+			backdrops := map[string]*api.Backdrop{}
 			configfiles.GimmeConfigFiles(&configfiles.Options{
 				Name:                      "dodo",
 				Extensions:                []string{"yaml", "yml", "json"},
@@ -86,7 +89,7 @@ func NewValidateCommand() *cobra.Command {
 		SilenceUsage:          true,
 		Args:                  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			backdrops := map[string]*types.Backdrop{}
+			backdrops := map[string]*api.Backdrop{}
 			configfiles.GimmeConfigFiles(&configfiles.Options{
 				FileGlobs:        args,
 				UseFileGlobsOnly: true,

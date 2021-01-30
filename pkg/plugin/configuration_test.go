@@ -3,6 +3,7 @@ package plugin_test
 import (
 	"testing"
 
+	api "github.com/dodo-cli/dodo-core/api/v1alpha1"
 	"github.com/dodo-cli/dodo-core/pkg/decoder"
 	"github.com/dodo-cli/dodo-core/pkg/types"
 	"github.com/stretchr/testify/assert"
@@ -108,7 +109,7 @@ include:
 `
 
 func TestInclude(t *testing.T) {
-	backdrops := map[string]*types.Backdrop{}
+	backdrops := map[string]*api.Backdrop{}
 	d := decoder.New("test")
 	d.DecodeYaml([]byte(includeExample), &backdrops, map[string]decoder.Decoding{
 		"backdrops": decoder.Map(types.NewBackdrop(), &backdrops),
@@ -117,7 +118,7 @@ func TestInclude(t *testing.T) {
 	assert.Equal(t, "bar", backdrops["foo"].ContainerName)
 }
 
-func getExampleConfig(t *testing.T, yamlConfig string) *types.Backdrop {
+func getExampleConfig(t *testing.T, yamlConfig string) *api.Backdrop {
 	// TODO: clean up this part
 	var mapType map[interface{}]interface{}
 	err := yaml.Unmarshal([]byte(yamlConfig), &mapType)
@@ -125,7 +126,7 @@ func getExampleConfig(t *testing.T, yamlConfig string) *types.Backdrop {
 
 	produce := types.NewBackdrop()
 	ptr, decode := produce()
-	config := *(ptr.(**types.Backdrop))
+	config := *(ptr.(**api.Backdrop))
 	d := decoder.New("test")
 	decode(d, mapType)
 	assert.Nil(t, err)
