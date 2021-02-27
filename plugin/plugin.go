@@ -12,11 +12,11 @@ import (
 
 func RunMe() int {
 	if os.Getenv(dodo.MagicCookieKey) == dodo.MagicCookieValue {
-		dodo.ServePlugins(&config.Configuration{})
+		dodo.ServePlugins(config.New())
 		return 0
 	} else {
 		log.SetDefault(log.New(appconfig.GetLoggerOptions()))
-		cmd := command.NewCommand()
+		cmd := command.New().GetCobraCommand()
 		if err := cmd.Execute(); err != nil {
 			return 1
 		}
@@ -25,5 +25,5 @@ func RunMe() int {
 }
 
 func IncludeMe() {
-	dodo.IncludePlugins(&config.Configuration{}, &command.Command{})
+	dodo.IncludePlugins(config.New(), command.New())
 }

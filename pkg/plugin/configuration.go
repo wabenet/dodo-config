@@ -17,12 +17,12 @@ var _ configuration.Configuration = &Configuration{}
 
 type Configuration struct{}
 
-func (p *Configuration) Type() plugin.Type {
-	return configuration.Type
+func New() *Configuration {
+	return &Configuration{}
 }
 
-func (p *Configuration) Init() error {
-	return nil
+func (p *Configuration) Type() plugin.Type {
+	return configuration.Type
 }
 
 func (p *Configuration) PluginInfo() (*api.PluginInfo, error) {
