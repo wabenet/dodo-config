@@ -3,11 +3,11 @@ package command
 import (
 	"fmt"
 
+	"github.com/dodo-cli/dodo-config/pkg/config"
 	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
-	"github.com/dodo-cli/dodo-core/pkg/decoder"
 	"github.com/dodo-cli/dodo-core/pkg/plugin"
 	"github.com/dodo-cli/dodo-core/pkg/plugin/command"
-	"github.com/dodo-cli/dodo-core/pkg/types"
+	log "github.com/hashicorp/go-hclog"
 	"github.com/oclaussen/go-gimme/configfiles"
 	"github.com/spf13/cobra"
 )
@@ -67,10 +67,14 @@ func NewListCommand() *cobra.Command {
 				Extensions:                []string{"yaml", "yml", "json"},
 				IncludeWorkingDirectories: true,
 				Filter: func(configFile *configfiles.ConfigFile) bool {
-					d := decoder.New(configFile.Path)
-					d.DecodeYaml(configFile.Content, &backdrops, map[string]decoder.Decoding{
-						"backdrops": decoder.Map(types.NewBackdrop(), &backdrops),
-					})
+					backdrops, err := config.ParseConfig(configFile.Path)
+					if err != nil {
+						log.L().Error(err.Error())
+					}
+
+					for name, backdrop := range backdrops {
+						backdrops[name] = backdrop // TODO: check for duplicates
+					}
 
 					return false
 				},
@@ -94,17 +98,11 @@ func NewValidateCommand() *cobra.Command {
 		SilenceUsage:          true,
 		Args:                  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			backdrops := map[string]*api.Backdrop{}
 			configfiles.GimmeConfigFiles(&configfiles.Options{
 				FileGlobs:        args,
 				UseFileGlobsOnly: true,
 				Filter: func(configFile *configfiles.ConfigFile) bool {
-					d := decoder.New(configFile.Path)
-					d.DecodeYaml(configFile.Content, &backdrops, map[string]decoder.Decoding{
-						"backdrops": decoder.Map(types.NewBackdrop(), &backdrops),
-					})
-
-					for _, err := range d.Errors() {
+					if _, err := config.ParseConfig(configFile.Path); err != nil {
 						fmt.Println(err)
 					}
 

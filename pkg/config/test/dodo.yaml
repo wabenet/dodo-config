@@ -1,0 +1,58 @@
+---
+backdrops:
+  test_all_defaults: {}
+
+  test_full_configs:
+    aliases: [test_alias]
+    image: testimage
+    container_name: testcontainer
+
+    environment:
+      FULL:
+        name: FOO
+        value: BAR
+      PARTIAL: {}
+
+    volumes:
+      full:
+        source: /from/path
+        target: /to/path
+        readonly: true
+      partial:
+        source: /some/mount
+
+    ports:
+      full:
+        target: 80
+        publish: 8080
+        host_ip: 192.168.0.1
+
+    user: testuser
+    working_dir: /home/test
+    script: |
+      echo "$@"
+
+  test_with_lists:
+    environment:
+      - FOO=BAR
+      - SOMETHING
+
+    volumes:
+      - foo:bar:ro
+
+    ports:
+      - 8080:80
+
+  test_build:
+    image:
+      name: testimage
+      context: /some/path
+      dockerfile: /some/other/path
+      steps: |
+        FROM foo
+        
+
+include:
+  - testfile: |
+      backdrops:
+        included_backdrop: {}

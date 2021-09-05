@@ -5,25 +5,25 @@ import (
 
 	"github.com/dodo-cli/dodo-config/pkg/command"
 	config "github.com/dodo-cli/dodo-config/pkg/plugin"
-	"github.com/dodo-cli/dodo-core/pkg/appconfig"
-	dodo "github.com/dodo-cli/dodo-core/pkg/plugin"
-	log "github.com/hashicorp/go-hclog"
+	"github.com/dodo-cli/dodo-core/pkg/plugin"
 )
 
 func RunMe() int {
-	if os.Getenv(dodo.MagicCookieKey) == dodo.MagicCookieValue {
-		dodo.ServePlugins(config.New())
+	m := plugin.Init()
+
+	if os.Getenv(plugin.MagicCookieKey) == plugin.MagicCookieValue {
+		m.ServePlugins(config.New())
+
 		return 0
 	} else {
-		log.SetDefault(log.New(appconfig.GetLoggerOptions()))
-		cmd := command.New().GetCobraCommand()
-		if err := cmd.Execute(); err != nil {
+		if err := command.New().GetCobraCommand().Execute(); err != nil {
 			return 1
 		}
+
 		return 0
 	}
 }
 
-func IncludeMe() {
-	dodo.IncludePlugins(config.New(), command.New())
+func IncludeMe(m plugin.Manager) {
+	m.IncludePlugins(config.New(), command.New())
 }

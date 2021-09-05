@@ -3,11 +3,10 @@ package plugin
 import (
 	"fmt"
 
+	"github.com/dodo-cli/dodo-config/pkg/config"
 	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
-	"github.com/dodo-cli/dodo-core/pkg/decoder"
 	"github.com/dodo-cli/dodo-core/pkg/plugin"
 	"github.com/dodo-cli/dodo-core/pkg/plugin/configuration"
-	"github.com/dodo-cli/dodo-core/pkg/types"
 	log "github.com/hashicorp/go-hclog"
 	"github.com/oclaussen/go-gimme/configfiles"
 	"github.com/sahilm/fuzzy"
@@ -85,16 +84,14 @@ func (p *Configuration) ListBackdrops() ([]*api.Backdrop, error) {
 		Filter: func(configFile *configfiles.ConfigFile) bool {
 			log.L().Debug("checking config file", "path", configFile.Path)
 
-			d := decoder.New(configFile.Path)
-			backdrops := map[string]*api.Backdrop{}
-			d.DecodeYaml(configFile.Content, &backdrops, map[string]decoder.Decoding{
-				"backdrops": decoder.Map(types.NewBackdrop(), &backdrops),
-			})
+			backdrops, err := config.ParseConfig(configFile.Path)
+			if err != nil {
+				log.L().Error(err.Error())
+			}
 
-			for name, b := range backdrops {
-				b.Name = name // TODO: This shouldn't be necessary. And not happen here
-				log.L().Debug("found backdrop", "name", b.Name)
-				result = append(result, b)
+			for _, backdrop := range backdrops {
+				log.L().Debug("found backdrop", "name", backdrop.Name)
+				result = append(result, backdrop)
 			}
 
 			return false
