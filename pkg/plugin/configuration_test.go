@@ -3,7 +3,7 @@ package plugin_test
 import (
 	"testing"
 
-	api "github.com/dodo-cli/dodo-core/api/v1alpha1"
+	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
 	"github.com/dodo-cli/dodo-core/pkg/decoder"
 	"github.com/dodo-cli/dodo-core/pkg/types"
 	"github.com/stretchr/testify/assert"

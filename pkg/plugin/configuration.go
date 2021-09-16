@@ -3,7 +3,7 @@ package plugin
 import (
 	"fmt"
 
-	api "github.com/dodo-cli/dodo-core/api/v1alpha1"
+	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
 	"github.com/dodo-cli/dodo-core/pkg/decoder"
 	"github.com/dodo-cli/dodo-core/pkg/plugin"
 	"github.com/dodo-cli/dodo-core/pkg/plugin/configuration"
@@ -12,6 +12,8 @@ import (
 	"github.com/oclaussen/go-gimme/configfiles"
 	"github.com/sahilm/fuzzy"
 )
+
+const name = "config"
 
 var _ configuration.Configuration = &Configuration{}
 
@@ -25,8 +27,14 @@ func (p *Configuration) Type() plugin.Type {
 	return configuration.Type
 }
 
-func (p *Configuration) PluginInfo() (*api.PluginInfo, error) {
-	return &api.PluginInfo{Name: "config"}, nil
+func (p *Configuration) PluginInfo() *api.PluginInfo {
+	return &api.PluginInfo{
+		Name: &api.PluginName{Name: name, Type: configuration.Type.String()},
+	}
+}
+
+func (*Configuration) Init() (plugin.PluginConfig, error) {
+	return map[string]string{}, nil
 }
 
 func (p *Configuration) GetBackdrop(alias string) (*api.Backdrop, error) {
