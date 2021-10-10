@@ -18,6 +18,7 @@ backdrops: [string]: #Backdrop
   volumes:         #Volumes     | [...#VolumeMount]         | [...string] | *[]
   devices:         #Devices     | [...#DeviceMount]         | [...string] | *[]
   capabilities:    [...string] | *[]
+  ...
 }
 
 #BuildInfo: {
@@ -30,6 +31,7 @@ backdrops: [string]: #Backdrop
   arguments:     #BuildArguments | [...#BuildArgument] | *[]
   secrets:       #BuildSecrets   | [...#BuildSecret]   | *[]
   ssh_agents:    #SSHAgents      | [...#SSHAgent]      | *[]
+  ...
 }
 
 #Environment: [string]: #EnvironmentVariable
