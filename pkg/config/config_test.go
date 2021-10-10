@@ -7,11 +7,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func ignore_TestInclude(t *testing.T) {
+func TestInclude(t *testing.T) {
 	config, err := config.ParseConfig("test/dodo.yaml")
 	assert.Nil(t, err)
 
-	_, ok := config["test2"]
+	_, ok := config["included_backdrop"]
 
 	assert.True(t, ok)
 }

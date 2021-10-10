@@ -53,6 +53,4 @@ backdrops:
         
 
 include:
-  - testfile: |
-      backdrops:
-        included_backdrop: {}
+  - file: "{{ currentDir }}/included.yaml"
