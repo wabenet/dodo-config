@@ -10,6 +10,7 @@ import (
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/encoding/yaml"
 	"github.com/dodo-cli/dodo-config/pkg/spec"
+	"github.com/dodo-cli/dodo-config/pkg/template"
 	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
 )
 
@@ -50,6 +51,11 @@ func ParseConfig(filename string) (map[string]*api.Backdrop, error) {
 
 func addFile(ctx *cue.Context, bi *build.Instance, filename string) error {
 	yamlFile, err := yaml.Extract(filename, nil)
+	if err != nil {
+		return err
+	}
+
+	yamlFile, err = template.TemplateCueAST(yamlFile)
 	if err != nil {
 		return err
 	}
