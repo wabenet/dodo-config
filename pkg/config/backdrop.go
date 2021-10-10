@@ -32,7 +32,7 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 	}
 
 	if p, ok := property(v, "name"); ok {
-		if n, err := p.String(); err != nil {
+		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
 			out.Name = n
@@ -40,7 +40,7 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 	}
 
 	if p, ok := property(v, "container_name"); ok {
-		if n, err := p.String(); err != nil {
+		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
 			out.ContainerName = n
@@ -48,7 +48,7 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 	}
 
 	if p, ok := property(v, "runtime"); ok {
-		if n, err := p.String(); err != nil {
+		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
 			out.Runtime = n
@@ -56,7 +56,7 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 	}
 
 	if p, ok := property(v, "script"); ok {
-		if n, err := p.String(); err != nil {
+		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
 			out.Entrypoint.Script = n
@@ -64,7 +64,7 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 	}
 
 	if p, ok := property(v, "user"); ok {
-		if n, err := p.String(); err != nil {
+		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
 			out.User = n
@@ -72,7 +72,7 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 	}
 
 	if p, ok := property(v, "working_dir"); ok {
-		if n, err := p.String(); err != nil {
+		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
 			out.WorkingDir = n
@@ -80,7 +80,7 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 	}
 
 	if p, ok := property(v, "image"); ok {
-		if n, err := p.String(); err == nil {
+		if n, err := StringFromValue(p); err == nil {
 			out.ImageId = n
 		} else if b, err := BuildInfoFromStruct(p); err == nil {
 			out.BuildInfo = b
@@ -90,7 +90,7 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 	}
 
 	if p, ok := property(v, "build"); ok {
-		if n, err := p.String(); err == nil {
+		if n, err := StringFromValue(p); err == nil {
 			out.ImageId = n
 		} else if b, err := BuildInfoFromStruct(p); err == nil {
 			out.BuildInfo = b

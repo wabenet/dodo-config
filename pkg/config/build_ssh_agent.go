@@ -60,7 +60,7 @@ func BuildSSHAgentFromStruct(name string, v cue.Value) (*api.SshAgent, error) {
 	out := &api.SshAgent{Id: name}
 
 	if p, ok := property(v, "path"); ok {
-		if n, err := p.String(); err != nil {
+		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
 			out.Id = n
@@ -68,7 +68,7 @@ func BuildSSHAgentFromStruct(name string, v cue.Value) (*api.SshAgent, error) {
 	}
 
 	if p, ok := property(v, "identity_file"); ok {
-		if n, err := p.String(); err != nil {
+		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
 			out.IdentityFile = n

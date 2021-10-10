@@ -62,7 +62,7 @@ func VolumeMountFromValue(name string, v cue.Value) (*api.VolumeMount, error) {
 }
 
 func VolumeMountFromString(_ string, v cue.Value) (*api.VolumeMount, error) {
-	s, err := v.String()
+	s, err := StringFromValue(v)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func VolumeMountFromStruct(name string, v cue.Value) (*api.VolumeMount, error) {
 	out := &api.VolumeMount{Source: name}
 
 	if p, ok := property(v, "source"); ok {
-		if v, err := p.String(); err != nil {
+		if v, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
 			out.Source = v
@@ -82,7 +82,7 @@ func VolumeMountFromStruct(name string, v cue.Value) (*api.VolumeMount, error) {
 	}
 
 	if p, ok := property(v, "target"); ok {
-		if v, err := p.String(); err != nil {
+		if v, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
 			out.Target = v

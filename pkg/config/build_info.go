@@ -9,7 +9,7 @@ func BuildInfoFromStruct(v cue.Value) (*api.BuildInfo, error) {
 	out := &api.BuildInfo{}
 
 	if p, ok := property(v, "name"); ok {
-		if n, err := p.String(); err != nil {
+		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
 			out.ImageName = n
@@ -17,7 +17,7 @@ func BuildInfoFromStruct(v cue.Value) (*api.BuildInfo, error) {
 	}
 
 	if p, ok := property(v, "builder"); ok {
-		if n, err := p.String(); err != nil {
+		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
 			out.Builder = n
@@ -25,7 +25,7 @@ func BuildInfoFromStruct(v cue.Value) (*api.BuildInfo, error) {
 	}
 
 	if p, ok := property(v, "context"); ok {
-		if n, err := p.String(); err != nil {
+		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
 			out.Context = n
@@ -33,7 +33,7 @@ func BuildInfoFromStruct(v cue.Value) (*api.BuildInfo, error) {
 	}
 
 	if p, ok := property(v, "dockerfile"); ok {
-		if n, err := p.String(); err != nil {
+		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
 			out.Dockerfile = n
@@ -41,7 +41,7 @@ func BuildInfoFromStruct(v cue.Value) (*api.BuildInfo, error) {
 	}
 
 	if p, ok := property(v, "steps"); ok {
-		if n, err := p.String(); err != nil {
+		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
 			out.InlineDockerfile = []string{n}

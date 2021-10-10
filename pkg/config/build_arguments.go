@@ -60,7 +60,7 @@ func BuildArgumentFromStruct(name string, v cue.Value) (*api.BuildArgument, erro
 	out := &api.BuildArgument{Key: name}
 
 	if p, ok := property(v, "name"); ok {
-		if n, err := p.String(); err != nil {
+		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
 			out.Key = n
@@ -68,7 +68,7 @@ func BuildArgumentFromStruct(name string, v cue.Value) (*api.BuildArgument, erro
 	}
 
 	if p, ok := property(v, "value"); ok {
-		if v, err := p.String(); err != nil {
+		if v, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
 			out.Value = v

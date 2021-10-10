@@ -61,7 +61,7 @@ func BuildSecretFromStruct(name string, v cue.Value) (*api.BuildSecret, error) {
 	out := &api.BuildSecret{Id: name}
 
 	if p, ok := property(v, "id"); ok {
-		if n, err := p.String(); err != nil {
+		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
 			out.Id = n
@@ -69,7 +69,7 @@ func BuildSecretFromStruct(name string, v cue.Value) (*api.BuildSecret, error) {
 	}
 
 	if p, ok := property(v, "path"); ok {
-		if n, err := p.String(); err != nil {
+		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
 			out.Path = n

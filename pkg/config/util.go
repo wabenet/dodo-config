@@ -4,11 +4,15 @@ import (
 	"cuelang.org/go/cue"
 )
 
+func StringFromValue(v cue.Value) (string, error) {
+	return v.String()
+}
+
 func StringListFromValue(v cue.Value) ([]string, error) {
 	out := []string{}
 
 	err := eachInList(v, func(v cue.Value) error {
-		str, err := v.String()
+		str, err := StringFromValue(v)
 		if err == nil {
 			out = append(out, str)
 		}
@@ -22,14 +26,6 @@ func StringListFromValue(v cue.Value) ([]string, error) {
 func property(v cue.Value, name string) (cue.Value, bool) {
 	p := v.LookupPath(cue.MakePath(cue.Str(name)))
 	return p, p.Exists()
-}
-
-func stringProperty(v cue.Value, name string) (string, error) {
-	if p, ok := property(v, name); !ok {
-		return "", nil
-	} else {
-		return p.String()
-	}
 }
 
 func eachInList(v cue.Value, f func(cue.Value) error) error {

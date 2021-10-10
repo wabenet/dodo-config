@@ -66,7 +66,7 @@ func addFile(ctx *cue.Context, bi *build.Instance, filename string) error {
 	if is, ok := property(value, "include"); ok {
 		if err := eachInList(is, func(v cue.Value) error {
 			if p, ok := property(v, "file"); ok {
-				if f, err := p.String(); err == nil {
+				if f, err := StringFromValue(p); err == nil {
 					return addFile(ctx, bi, f)
 				} else {
 					return err

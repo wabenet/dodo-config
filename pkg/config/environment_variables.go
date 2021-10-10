@@ -62,7 +62,7 @@ func EnvironmentVariableFromValue(name string, v cue.Value) (*api.EnvironmentVar
 }
 
 func EnvironmentVariableFromString(_ string, v cue.Value) (*api.EnvironmentVariable, error) {
-	s, err := v.String()
+	s, err := StringFromValue(v)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func EnvironmentVariableFromStruct(name string, v cue.Value) (*api.EnvironmentVa
 	out := &api.EnvironmentVariable{Key: name}
 
 	if p, ok := property(v, "name"); ok {
-		if v, err := p.String(); err != nil {
+		if v, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
 			out.Key = v
@@ -82,7 +82,7 @@ func EnvironmentVariableFromStruct(name string, v cue.Value) (*api.EnvironmentVa
 	}
 
 	if p, ok := property(v, "value"); ok {
-		if v, err := p.String(); err != nil {
+		if v, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
 			out.Value = v
