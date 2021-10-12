@@ -27,6 +27,14 @@ backdrops:
         publish: 8080
         host_ip: 192.168.0.1
 
+    devices:
+      full:
+        source: /dev/snd
+        target: /foo/bar
+        permissions: rw
+      rule:
+        cgroup_rule: "c *:* rmw"
+
     user: testuser
     working_dir: /home/test
     script: |
@@ -42,6 +50,9 @@ backdrops:
 
     ports:
       - 8080:80
+
+    devices:
+      - /dev/snd:/dev/snd
 
   test_build:
     image:

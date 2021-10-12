@@ -16,7 +16,7 @@ backdrops: [string]: #Backdrop
   environment:     #Environment | [...#EnvironmentVariable] | [...string] | *[]
   ports:           #Ports       | [...#PortMapping]         | [...string] | *[]
   volumes:         #Volumes     | [...#VolumeMount]         | [...string] | *[]
-  devices:         #Devices     | [...#DeviceMount]         | [...string] | *[]
+  devices:         #Devices     | [...#DeviceMapping]       | [...string] | *[]
   capabilities:    [...string] | *[]
   ...
 }
@@ -58,7 +58,9 @@ backdrops: [string]: #Backdrop
   readonly: bool | *false
 }
 
-#Devices: [string]: #DeviceMount
+#Devices: [string]: #DeviceMapping
+
+#DeviceMapping: #DeviceMount | #DeviceRule
 
 #DeviceMount: {
   source:       string

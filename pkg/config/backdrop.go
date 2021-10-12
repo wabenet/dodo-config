@@ -147,5 +147,13 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 		}
 	}
 
+	if p, ok := property(v, "devices"); ok {
+		if ds, err := DeviceMappingsFromValue(p); err != nil {
+			return nil, err
+		} else {
+			out.Devices = ds
+		}
+	}
+
 	return out, nil
 }
