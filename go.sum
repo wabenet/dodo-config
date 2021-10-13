@@ -60,6 +60,8 @@ github.com/deckarep/golang-set v1.7.1 h1:SCQV0S6gTtp6itiFrTqI+pfmJ4LN85S1YzhDf9r
 github.com/deckarep/golang-set v1.7.1/go.mod h1:93vsz/8Wt4joVM7c2AVqh+YRMiUSc14yDtF28KmMOgQ=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/dgryski/go-sip13 v0.0.0-20181026042036-e10d5fee7954/go.mod h1:vAd38F8PWV+bWy6jNmig1y/TA+kYO4g3RSRF0IAv0no=
+github.com/dodo-cli/dodo-core v0.1.1-0.20210924074715-98d75e972e1d h1:7wVjY+FVe6RRTSu9u6L8R4sl+54hImIcUqVkFsGwcag=
+github.com/dodo-cli/dodo-core v0.1.1-0.20210924074715-98d75e972e1d/go.mod h1:oJwQ515hoxo6H+m7RcVVeWo/qc/b7ilGesNdo8fLoDw=
 github.com/emicklei/proto v1.6.15 h1:XbpwxmuOPrdES97FrSfpyy67SSCV/wBIKXqgJzh6hNw=
 github.com/emicklei/proto v1.6.15/go.mod h1:rn1FgRS/FANiZdD2djyH7TMA9jdRDcYQ9IEN9yvjX0A=
 github.com/envoyproxy/go-control-plane v0.9.0/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=

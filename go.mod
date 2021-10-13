@@ -5,7 +5,7 @@ go 1.16
 require (
 	cuelang.org/go v0.4.0
 	github.com/Masterminds/sprig v2.22.0+incompatible
-	github.com/dodo-cli/dodo-core v0.1.1-0.20210915164217-1c50006deac2
+	github.com/dodo-cli/dodo-core v0.1.1-0.20210924074715-98d75e972e1d
 	github.com/google/go-cmp v0.5.2 // indirect
 	github.com/hashicorp/go-hclog v0.15.0
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
@@ -17,7 +17,7 @@ require (
 	github.com/spf13/cobra v1.1.3
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/net v0.0.0-20210119194325-5f4716e94777 // indirect
-	golang.org/x/text v0.3.5 // indirect
+	golang.org/x/text v0.3.5
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
