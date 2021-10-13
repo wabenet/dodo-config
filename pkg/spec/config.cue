@@ -16,7 +16,7 @@ backdrops: [string]: #Backdrop
   build?:          #BuildInfo
   runtime?:        string
   script?:         string
-  interpreter:     [...string] | *["/bin/sh", "-c"]
+  interpreter?:    [...string]
   user?:           string
   working_dir?:    string
   environment:     #Environment | [...#EnvironmentVariable] | [...string] | *[]

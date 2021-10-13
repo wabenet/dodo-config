@@ -26,7 +26,6 @@ func TestBasicBackdrop(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, "testimage", backdrop.ImageId)
 	assert.Equal(t, "testcontainer", backdrop.ContainerName)
-	assert.Contains(t, backdrop.Entrypoint.Interpreter, "/bin/sh")
 	assert.Equal(t, "/home/test", backdrop.WorkingDir)
 	assert.Equal(t, "echo \"$@\"\n", backdrop.Entrypoint.Script)
 }
