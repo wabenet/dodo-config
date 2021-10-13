@@ -8,10 +8,10 @@ import (
 )
 
 func TestFullVolume(t *testing.T) {
-	config, err := config.ParseConfig("test/dodo.yaml")
+	cfg, err := config.ParseConfig("test/dodo.yaml")
 	assert.Nil(t, err)
 
-	backdrop, ok := config["test_full_configs"]
+	backdrop, ok := cfg.Backdrops["test_full_configs"]
 
 	assert.True(t, ok)
 	assert.NotEmpty(t, backdrop.Volumes)
@@ -20,6 +20,7 @@ func TestFullVolume(t *testing.T) {
 		if vol.Source == "/from/path" {
 			assert.Equal(t, "/to/path", vol.Target)
 			assert.True(t, vol.Readonly)
+
 			return
 		}
 	}
@@ -28,10 +29,10 @@ func TestFullVolume(t *testing.T) {
 }
 
 func TestPartialVolume(t *testing.T) {
-	config, err := config.ParseConfig("test/dodo.yaml")
+	cfg, err := config.ParseConfig("test/dodo.yaml")
 	assert.Nil(t, err)
 
-	backdrop, ok := config["test_full_configs"]
+	backdrop, ok := cfg.Backdrops["test_full_configs"]
 
 	assert.True(t, ok)
 	assert.NotEmpty(t, backdrop.Volumes)
@@ -46,10 +47,10 @@ func TestPartialVolume(t *testing.T) {
 }
 
 func TestVolumesWithLists(t *testing.T) {
-	config, err := config.ParseConfig("test/dodo.yaml")
+	cfg, err := config.ParseConfig("test/dodo.yaml")
 	assert.Nil(t, err)
 
-	backdrop, ok := config["test_with_lists"]
+	backdrop, ok := cfg.Backdrops["test_with_lists"]
 
 	assert.True(t, ok)
 	assert.Equal(t, 1, len(backdrop.Volumes))

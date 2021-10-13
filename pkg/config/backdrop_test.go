@@ -1,7 +1,6 @@
 package config_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/dodo-cli/dodo-config/pkg/config"
@@ -9,25 +8,20 @@ import (
 )
 
 func TestAllDefaults(t *testing.T) {
-	config, err := config.ParseConfig("test/dodo.yaml")
-	if err != nil {
-		fmt.Printf(err.Error())
-	} else {
-		fmt.Printf("%v\n", config)
-	}
+	cfg, err := config.ParseConfig("test/dodo.yaml")
 
 	assert.Nil(t, err)
 
-	_, ok := config["test_all_defaults"]
+	_, ok := cfg.Backdrops["test_all_defaults"]
 	assert.True(t, ok)
 }
 
 func TestBasicBackdrop(t *testing.T) {
-	config, err := config.ParseConfig("test/dodo.yaml")
+	cfg, err := config.ParseConfig("test/dodo.yaml")
 
 	assert.Nil(t, err)
 
-	backdrop, ok := config["test_full_configs"]
+	backdrop, ok := cfg.Backdrops["test_full_configs"]
 
 	assert.True(t, ok)
 	assert.Equal(t, "testimage", backdrop.ImageId)

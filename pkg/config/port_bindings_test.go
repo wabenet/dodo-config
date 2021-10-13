@@ -8,10 +8,10 @@ import (
 )
 
 func TestFullPortBindings(t *testing.T) {
-	config, err := config.ParseConfig("test/dodo.yaml")
+	cfg, err := config.ParseConfig("test/dodo.yaml")
 	assert.Nil(t, err)
 
-	backdrop, ok := config["test_full_configs"]
+	backdrop, ok := cfg.Backdrops["test_full_configs"]
 
 	assert.True(t, ok)
 	assert.Equal(t, 1, len(backdrop.Ports))
@@ -28,10 +28,10 @@ func TestFullPortBindings(t *testing.T) {
 }
 
 func TestPortBindingsWithList(t *testing.T) {
-	config, err := config.ParseConfig("test/dodo.yaml")
+	cfg, err := config.ParseConfig("test/dodo.yaml")
 	assert.Nil(t, err)
 
-	backdrop, ok := config["test_with_lists"]
+	backdrop, ok := cfg.Backdrops["test_with_lists"]
 
 	assert.True(t, ok)
 	assert.Equal(t, 1, len(backdrop.Ports))

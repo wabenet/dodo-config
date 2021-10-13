@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/encoding/yaml"
@@ -16,7 +15,40 @@ import (
 
 var ErrUnexpectedSpec = errors.New("Whelp, we don't match the expected specification. Now what?")
 
-func ParseConfig(filename string) (map[string]*api.Backdrop, error) {
+type Config struct {
+	Backdrops map[string]*api.Backdrop
+	Includes  []string
+}
+
+func GetAllBackdrops(filenames ...string) (map[string]*api.Backdrop, error) {
+	backdrops := map[string]*api.Backdrop{}
+
+	for _, filename := range filenames {
+		config, err := ParseConfig(filename)
+		if err != nil {
+			return nil, err
+		}
+
+		for name, backdrop := range config.Backdrops {
+			backdrops[name] = backdrop
+		}
+
+		for _, include := range config.Includes {
+			included, err := GetAllBackdrops(include)
+			if err != nil {
+				return nil, err
+			}
+
+			for name, backdrop := range included {
+				backdrops[name] = backdrop
+			}
+		}
+	}
+
+	return backdrops, nil
+}
+
+func ParseConfig(filename string) (*Config, error) {
 	ctx := cuecontext.New()
 
 	bis := load.Instances([]string{"-"}, &load.Config{
@@ -33,7 +65,17 @@ func ParseConfig(filename string) (map[string]*api.Backdrop, error) {
 		return nil, bi.Err
 	}
 
-	if err := addFile(ctx, bi, filename); err != nil {
+	yamlFile, err := yaml.Extract(filename, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	yamlFile, err = template.TemplateCueAST(yamlFile)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := bi.AddSyntax(yamlFile); err != nil {
 		return nil, err
 	}
 
@@ -42,56 +84,31 @@ func ParseConfig(filename string) (map[string]*api.Backdrop, error) {
 		return nil, err
 	}
 
-	if err := value.Validate(cue.Concrete(true)); err != nil {
+	if err := value.Validate(cue.Concrete(true), cue.Final()); err != nil {
 		return nil, err
 	}
 
-	return Config(value)
+	return ConfigFromValue(value)
 }
 
-func addFile(ctx *cue.Context, bi *build.Instance, filename string) error {
-	yamlFile, err := yaml.Extract(filename, nil)
-	if err != nil {
-		return err
-	}
+func ConfigFromValue(v cue.Value) (*Config, error) {
+	out := &Config{}
 
-	yamlFile, err = template.TemplateCueAST(yamlFile)
-	if err != nil {
-		return err
-	}
-
-	if err := bi.AddSyntax(yamlFile); err != nil {
-		return err
-	}
-
-	value := ctx.BuildFile(yamlFile)
-	if err := value.Err(); err != nil {
-		return err
-	}
-
-	if is, ok := property(value, "include"); ok {
-		if err := eachInList(is, func(v cue.Value) error {
-			if p, ok := property(v, "file"); ok {
-				if f, err := StringFromValue(p); err == nil {
-					return addFile(ctx, bi, f)
-				} else {
-					return err
-				}
-			}
-
-			return nil
-		}); err != nil {
-			return err
+	if p, ok := property(v, "backdrops"); ok {
+		if bs, err := BackdropsFromValue(p); err != nil {
+			return nil, err
+		} else {
+			out.Backdrops = bs
 		}
 	}
 
-	return nil
-}
-
-func Config(v cue.Value) (map[string]*api.Backdrop, error) {
-	if p, ok := property(v, "backdrops"); !ok {
-		return map[string]*api.Backdrop{}, ErrUnexpectedSpec
-	} else {
-		return BackdropsFromValue(p)
+	if p, ok := property(v, "include"); ok {
+		if is, err := IncludesFromValue(p); err != nil {
+			return nil, err
+		} else {
+			out.Includes = is
+		}
 	}
+
+	return out, nil
 }

@@ -1,8 +1,13 @@
 package command
 
 import (
+	"bytes"
 	"fmt"
+	"io"
+	"os"
+	"strings"
 
+	"cuelang.org/go/cue/errors"
 	"github.com/dodo-cli/dodo-config/pkg/config"
 	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
 	"github.com/dodo-cli/dodo-core/pkg/plugin"
@@ -10,6 +15,8 @@ import (
 	log "github.com/hashicorp/go-hclog"
 	"github.com/oclaussen/go-gimme/configfiles"
 	"github.com/spf13/cobra"
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 )
 
 const name = "config"
@@ -61,28 +68,26 @@ func NewListCommand() *cobra.Command {
 		DisableFlagsInUseLine: true,
 		SilenceUsage:          true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			backdrops := map[string]*api.Backdrop{}
+			filenames := []string{}
 			configfiles.GimmeConfigFiles(&configfiles.Options{
 				Name:                      "dodo",
 				Extensions:                []string{"yaml", "yml", "json"},
 				IncludeWorkingDirectories: true,
 				Filter: func(configFile *configfiles.ConfigFile) bool {
-					backdrops, err := config.ParseConfig(configFile.Path)
-					if err != nil {
-						log.L().Error(err.Error())
-					}
-
-					for name, backdrop := range backdrops {
-						backdrops[name] = backdrop // TODO: check for duplicates
-					}
-
+					filenames = append(filenames, configFile.Path)
 					return false
 				},
 			})
 
+			backdrops, err := config.GetAllBackdrops(filenames...)
+			if err != nil {
+				log.L().Error(err.Error())
+			}
+
+			p := getPrettyPrinter()
+
 			for name := range backdrops {
-				// TODO filename
-				fmt.Println(name)
+				p.Fprintf(os.Stdout, "%s\n", name) // TODO filename
 			}
 
 			return nil
@@ -98,19 +103,39 @@ func NewValidateCommand() *cobra.Command {
 		SilenceUsage:          true,
 		Args:                  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			configfiles.GimmeConfigFiles(&configfiles.Options{
-				FileGlobs:        args,
-				UseFileGlobsOnly: true,
-				Filter: func(configFile *configfiles.ConfigFile) bool {
-					if _, err := config.ParseConfig(configFile.Path); err != nil {
-						fmt.Println(err)
-					}
+			p := getPrettyPrinter()
 
-					return false
+			_, err := config.GetAllBackdrops(args...)
+			if err == nil {
+				p.Fprintf(os.Stdout, "configuration is valid!\n")
+
+				return nil
+			}
+
+			cwd, _ := os.Getwd()
+			w := &bytes.Buffer{}
+
+			errors.Print(w, err, &errors.Config{
+				Format: func(w io.Writer, format string, args ...interface{}) {
+					p.Fprintf(w, format, args...)
 				},
+				Cwd:     cwd,
+				ToSlash: false,
 			})
+
+			fmt.Fprintf(os.Stdout, string(w.Bytes()))
 
 			return nil
 		},
 	}
+}
+
+func getPrettyPrinter() *message.Printer {
+	loc := os.Getenv("LC_ALL")
+	if loc == "" {
+		loc = os.Getenv("LANG")
+	}
+	loc = strings.Split(loc, ".")[0]
+
+	return message.NewPrinter(language.Make(loc))
 }

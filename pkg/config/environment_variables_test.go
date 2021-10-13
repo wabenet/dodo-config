@@ -8,10 +8,10 @@ import (
 )
 
 func TestFullEnvironment(t *testing.T) {
-	config, err := config.ParseConfig("test/dodo.yaml")
+	cfg, err := config.ParseConfig("test/dodo.yaml")
 	assert.Nil(t, err)
 
-	backdrop, ok := config["test_full_configs"]
+	backdrop, ok := cfg.Backdrops["test_full_configs"]
 
 	assert.True(t, ok)
 	assert.NotEmpty(t, backdrop.Environment)
@@ -29,10 +29,10 @@ func TestFullEnvironment(t *testing.T) {
 }
 
 func TestPartialEnvironment(t *testing.T) {
-	config, err := config.ParseConfig("test/dodo.yaml")
+	cfg, err := config.ParseConfig("test/dodo.yaml")
 	assert.Nil(t, err)
 
-	backdrop, ok := config["test_full_configs"]
+	backdrop, ok := cfg.Backdrops["test_full_configs"]
 
 	assert.True(t, ok)
 	assert.NotEmpty(t, backdrop.Environment)
@@ -48,10 +48,10 @@ func TestPartialEnvironment(t *testing.T) {
 }
 
 func TestEnvironmentWithList(t *testing.T) {
-	config, err := config.ParseConfig("test/dodo.yaml")
+	cfg, err := config.ParseConfig("test/dodo.yaml")
 	assert.Nil(t, err)
 
-	backdrop, ok := config["test_with_lists"]
+	backdrop, ok := cfg.Backdrops["test_with_lists"]
 
 	assert.True(t, ok)
 	assert.Equal(t, 2, len(backdrop.Environment))

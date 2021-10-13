@@ -8,14 +8,14 @@ import (
 )
 
 func TestBuildInfo(t *testing.T) {
-	config, err := config.ParseConfig("test/dodo.yaml")
+	cfg, err := config.ParseConfig("test/dodo.yaml")
 
 	assert.Nil(t, err)
 
-	backdrop, ok := config["test_build"]
+	backdrop, ok := cfg.Backdrops["test_build"]
 	assert.True(t, ok)
 
-        build := backdrop.BuildInfo
+	build := backdrop.BuildInfo
 	assert.NotNil(t, backdrop.BuildInfo)
 
 	assert.Equal(t, "testimage", build.ImageName)

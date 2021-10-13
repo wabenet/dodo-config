@@ -7,7 +7,6 @@ import (
 	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
 	"github.com/dodo-cli/dodo-core/pkg/plugin"
 	"github.com/dodo-cli/dodo-core/pkg/plugin/configuration"
-	log "github.com/hashicorp/go-hclog"
 	"github.com/oclaussen/go-gimme/configfiles"
 	"github.com/sahilm/fuzzy"
 )
@@ -76,27 +75,27 @@ func findBackdrop(backdrops []*api.Backdrop, name string) (*api.Backdrop, error)
 }
 
 func (p *Configuration) ListBackdrops() ([]*api.Backdrop, error) {
-	result := []*api.Backdrop{}
+	filenames := []string{}
 	configfiles.GimmeConfigFiles(&configfiles.Options{
 		Name:                      "dodo",
 		Extensions:                []string{"yaml", "yml", "json"},
 		IncludeWorkingDirectories: true,
 		Filter: func(configFile *configfiles.ConfigFile) bool {
-			log.L().Debug("checking config file", "path", configFile.Path)
-
-			backdrops, err := config.ParseConfig(configFile.Path)
-			if err != nil {
-				log.L().Error(err.Error())
-			}
-
-			for _, backdrop := range backdrops {
-				log.L().Debug("found backdrop", "name", backdrop.Name)
-				result = append(result, backdrop)
-			}
-
+			filenames = append(filenames, configFile.Path)
 			return false
 		},
 	})
+
+	result := []*api.Backdrop{}
+
+	backdrops, err := config.GetAllBackdrops(filenames...)
+	if err != nil {
+		return result, err
+	}
+
+	for _, b := range backdrops {
+		result = append(result, b)
+	}
 
 	return result, nil
 }
