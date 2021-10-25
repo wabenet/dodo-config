@@ -5,7 +5,7 @@ go 1.16
 require (
 	cuelang.org/go v0.4.0
 	github.com/Masterminds/sprig v2.22.0+incompatible
-	github.com/dodo-cli/dodo-core v0.1.1-0.20210924074715-98d75e972e1d
+	github.com/dodo-cli/dodo-core v0.2.0
 	github.com/google/go-cmp v0.5.2 // indirect
 	github.com/hashicorp/go-hclog v0.15.0
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
