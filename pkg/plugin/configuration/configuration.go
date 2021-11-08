@@ -15,7 +15,9 @@ const name = "config"
 
 var _ configuration.Configuration = &Configuration{}
 
-type Configuration struct{}
+type Configuration struct {
+	backdrops map[string]*api.Backdrop
+}
 
 func New() *Configuration {
 	return &Configuration{}
@@ -31,22 +33,43 @@ func (p *Configuration) PluginInfo() *api.PluginInfo {
 	}
 }
 
-func (*Configuration) Init() (plugin.PluginConfig, error) {
+func (p *Configuration) Init() (plugin.PluginConfig, error) {
 	return map[string]string{}, nil
 }
 
-func (p *Configuration) GetBackdrop(alias string) (*api.Backdrop, error) {
-	backdrops, err := p.ListBackdrops()
+func (p *Configuration) get() (map[string]*api.Backdrop, error) {
+	if p.backdrops != nil {
+		return p.backdrops, nil
+	}
+
+	filenames := []string{}
+	configfiles.GimmeConfigFiles(&configfiles.Options{
+		Name:                      "dodo",
+		Extensions:                []string{"yaml", "yml", "json"},
+		IncludeWorkingDirectories: true,
+		Filter: func(configFile *configfiles.ConfigFile) bool {
+			filenames = append(filenames, configFile.Path)
+			return false
+		},
+	})
+
+	backdrops, err := config.GetAllBackdrops(filenames...)
 	if err != nil {
 		return nil, err
 	}
 
-	if result, err := findBackdrop(backdrops, alias); err == nil {
+	p.backdrops = backdrops
+
+	return p.backdrops, nil
+}
+
+func (p *Configuration) GetBackdrop(alias string) (*api.Backdrop, error) {
+	if result, err := p.findBackdrop(alias); err == nil {
 		return result, nil
 	}
 
 	names := []string{}
-	for _, b := range backdrops {
+	for _, b := range p.backdrops {
 		names = append(names, b.Name)
 		names = append(names, b.Aliases...)
 	}
@@ -58,8 +81,13 @@ func (p *Configuration) GetBackdrop(alias string) (*api.Backdrop, error) {
 	return nil, fmt.Errorf("backdrop '%s' not found, did you mean '%s'?", alias, matches[0].Str)
 }
 
-func findBackdrop(backdrops []*api.Backdrop, name string) (*api.Backdrop, error) {
-	for _, b := range backdrops {
+func (p *Configuration) findBackdrop(name string) (*api.Backdrop, error) {
+	bs, err := p.get()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, b := range bs {
 		if b.Name == name {
 			return b, nil
 		}
@@ -75,25 +103,14 @@ func findBackdrop(backdrops []*api.Backdrop, name string) (*api.Backdrop, error)
 }
 
 func (p *Configuration) ListBackdrops() ([]*api.Backdrop, error) {
-	filenames := []string{}
-	configfiles.GimmeConfigFiles(&configfiles.Options{
-		Name:                      "dodo",
-		Extensions:                []string{"yaml", "yml", "json"},
-		IncludeWorkingDirectories: true,
-		Filter: func(configFile *configfiles.ConfigFile) bool {
-			filenames = append(filenames, configFile.Path)
-			return false
-		},
-	})
-
 	result := []*api.Backdrop{}
 
-	backdrops, err := config.GetAllBackdrops(filenames...)
+	bs, err := p.get()
 	if err != nil {
-		return result, err
+		return nil, err
 	}
 
-	for _, b := range backdrops {
+	for _, b := range bs {
 		result = append(result, b)
 	}
 
