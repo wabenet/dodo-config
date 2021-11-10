@@ -8,7 +8,6 @@ import (
 	"github.com/dodo-cli/dodo-core/pkg/plugin"
 	"github.com/dodo-cli/dodo-core/pkg/plugin/configuration"
 	"github.com/oclaussen/go-gimme/configfiles"
-	"github.com/sahilm/fuzzy"
 )
 
 const name = "config"
@@ -63,25 +62,7 @@ func (p *Configuration) get() (map[string]*api.Backdrop, error) {
 	return p.backdrops, nil
 }
 
-func (p *Configuration) GetBackdrop(alias string) (*api.Backdrop, error) {
-	if result, err := p.findBackdrop(alias); err == nil {
-		return result, nil
-	}
-
-	names := []string{}
-	for _, b := range p.backdrops {
-		names = append(names, b.Name)
-		names = append(names, b.Aliases...)
-	}
-
-	matches := fuzzy.Find(alias, names)
-	if len(matches) == 0 {
-		return nil, fmt.Errorf("could not find any configuration for backdrop '%s'", alias)
-	}
-	return nil, fmt.Errorf("backdrop '%s' not found, did you mean '%s'?", alias, matches[0].Str)
-}
-
-func (p *Configuration) findBackdrop(name string) (*api.Backdrop, error) {
+func (p *Configuration) GetBackdrop(name string) (*api.Backdrop, error) {
 	bs, err := p.get()
 	if err != nil {
 		return nil, err
