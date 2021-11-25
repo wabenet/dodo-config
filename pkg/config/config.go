@@ -11,6 +11,7 @@ import (
 	"github.com/dodo-cli/dodo-config/pkg/spec"
 	"github.com/dodo-cli/dodo-config/pkg/template"
 	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
+	"github.com/hashicorp/go-multierror"
 )
 
 var ErrUnexpectedSpec = errors.New("Whelp, we don't match the expected specification. Now what?")
@@ -21,12 +22,14 @@ type Config struct {
 }
 
 func GetAllBackdrops(filenames ...string) (map[string]*api.Backdrop, error) {
+	var errs error
 	backdrops := map[string]*api.Backdrop{}
 
 	for _, filename := range filenames {
 		config, err := ParseConfig(filename)
 		if err != nil {
-			return nil, err
+			errs = multierror.Append(errs, err)
+			continue
 		}
 
 		for name, backdrop := range config.Backdrops {
@@ -36,7 +39,8 @@ func GetAllBackdrops(filenames ...string) (map[string]*api.Backdrop, error) {
 		for _, include := range config.Includes {
 			included, err := GetAllBackdrops(include)
 			if err != nil {
-				return nil, err
+				errs = multierror.Append(errs, err)
+				continue
 			}
 
 			for name, backdrop := range included {
@@ -45,7 +49,7 @@ func GetAllBackdrops(filenames ...string) (map[string]*api.Backdrop, error) {
 		}
 	}
 
-	return backdrops, nil
+	return backdrops, errs
 }
 
 func ParseConfig(filename string) (*Config, error) {
