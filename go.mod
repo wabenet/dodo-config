@@ -7,7 +7,7 @@ require (
 	github.com/Masterminds/goutils v1.1.0 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
-	github.com/dodo-cli/dodo-core v0.3.0
+	github.com/dodo-cli/dodo-core v0.3.1
 	github.com/google/go-cmp v0.5.2 // indirect
 	github.com/hashicorp/go-hclog v0.15.0
 	github.com/hashicorp/go-multierror v1.0.0
