@@ -3,18 +3,25 @@ package config
 import (
 	"cuelang.org/go/cue"
 	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
+	"github.com/hashicorp/go-multierror"
 )
 
 func BuildArgumentsFromValue(v cue.Value) ([]*api.BuildArgument, error) {
+	var errs error
+
 	if out, err := BuildArgumentsFromMap(v); err == nil {
 		return out, nil
+	} else {
+		errs = multierror.Append(errs, err)
 	}
 
 	if out, err := BuildArgumentsFromList(v); err == nil {
 		return out, nil
+	} else {
+		errs = multierror.Append(errs, err)
 	}
 
-	return nil, ErrUnexpectedSpec
+	return nil, errs
 }
 
 func BuildArgumentsFromMap(v cue.Value) ([]*api.BuildArgument, error) {
@@ -49,11 +56,15 @@ func BuildArgumentsFromList(v cue.Value) ([]*api.BuildArgument, error) {
 }
 
 func BuildArgumentFromValue(name string, v cue.Value) (*api.BuildArgument, error) {
+	var errs error
+
 	if out, err := BuildArgumentFromStruct(name, v); err == nil {
 		return out, err
+	} else {
+		errs = multierror.Append(errs, err)
 	}
 
-	return nil, ErrUnexpectedSpec
+	return nil, errs
 }
 
 func BuildArgumentFromStruct(name string, v cue.Value) (*api.BuildArgument, error) {

@@ -4,18 +4,25 @@ import (
 	"cuelang.org/go/cue"
 	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
 	"github.com/dodo-cli/dodo-core/pkg/config"
+	"github.com/hashicorp/go-multierror"
 )
 
 func VolumeMountsFromValue(v cue.Value) ([]*api.VolumeMount, error) {
+	var errs error
+
 	if out, err := VolumeMountsFromMap(v); err == nil {
 		return out, err
+	} else {
+		errs = multierror.Append(errs, err)
 	}
 
 	if out, err := VolumeMountsFromList(v); err == nil {
 		return out, err
+	} else {
+		errs = multierror.Append(errs, err)
 	}
 
-	return nil, ErrUnexpectedSpec
+	return nil, errs
 }
 
 func VolumeMountsFromMap(v cue.Value) ([]*api.VolumeMount, error) {
@@ -50,15 +57,21 @@ func VolumeMountsFromList(v cue.Value) ([]*api.VolumeMount, error) {
 }
 
 func VolumeMountFromValue(name string, v cue.Value) (*api.VolumeMount, error) {
+	var errs error
+
 	if out, err := VolumeMountFromString(name, v); err == nil {
 		return out, err
+	} else {
+		errs = multierror.Append(errs, err)
 	}
 
 	if out, err := VolumeMountFromStruct(name, v); err == nil {
 		return out, err
+	} else {
+		errs = multierror.Append(errs, err)
 	}
 
-	return nil, ErrUnexpectedSpec
+	return nil, errs
 }
 
 func VolumeMountFromString(_ string, v cue.Value) (*api.VolumeMount, error) {

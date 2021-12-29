@@ -6,18 +6,25 @@ import (
 	"cuelang.org/go/cue"
 	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
 	"github.com/dodo-cli/dodo-core/pkg/config"
+	"github.com/hashicorp/go-multierror"
 )
 
 func PortBindingsFromValue(v cue.Value) ([]*api.PortBinding, error) {
+	var errs error
+
 	if out, err := PortBindingsFromMap(v); err == nil {
 		return out, nil
+	} else {
+		errs = multierror.Append(errs, err)
 	}
 
 	if out, err := PortBindingsFromList(v); err == nil {
 		return out, nil
+	} else {
+		errs = multierror.Append(errs, err)
 	}
 
-	return nil, ErrUnexpectedSpec
+	return nil, errs
 }
 
 func PortBindingsFromMap(v cue.Value) ([]*api.PortBinding, error) {
@@ -52,15 +59,21 @@ func PortBindingsFromList(v cue.Value) ([]*api.PortBinding, error) {
 }
 
 func PortBindingFromValue(name string, v cue.Value) (*api.PortBinding, error) {
+	var errs error
+
 	if out, err := PortBindingFromString(name, v); err == nil {
 		return out, nil
+	} else {
+		errs = multierror.Append(errs, err)
 	}
 
 	if out, err := PortBindingFromStruct(name, v); err == nil {
 		return out, nil
+	} else {
+		errs = multierror.Append(errs, err)
 	}
 
-	return nil, ErrUnexpectedSpec
+	return nil, errs
 }
 
 func PortBindingFromString(_ string, v cue.Value) (*api.PortBinding, error) {

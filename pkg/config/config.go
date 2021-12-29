@@ -14,8 +14,6 @@ import (
 	"github.com/hashicorp/go-multierror"
 )
 
-var ErrUnexpectedSpec = errors.New("Whelp, we don't match the expected specification. Now what?")
-
 type Config struct {
 	Backdrops map[string]*api.Backdrop
 	Includes  []string

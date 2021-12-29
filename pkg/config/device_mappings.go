@@ -4,18 +4,25 @@ import (
 	"cuelang.org/go/cue"
 	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
 	"github.com/dodo-cli/dodo-core/pkg/config"
+	"github.com/hashicorp/go-multierror"
 )
 
 func DeviceMappingsFromValue(v cue.Value) ([]*api.DeviceMapping, error) {
+	var errs error
+
 	if out, err := DeviceMappingsFromMap(v); err == nil {
 		return out, nil
+	} else {
+		errs = multierror.Append(errs, err)
 	}
 
 	if out, err := DeviceMappingsFromList(v); err == nil {
 		return out, nil
+	} else {
+		errs = multierror.Append(errs, err)
 	}
 
-	return nil, ErrUnexpectedSpec
+	return nil, errs
 }
 
 func DeviceMappingsFromMap(v cue.Value) ([]*api.DeviceMapping, error) {
@@ -50,15 +57,21 @@ func DeviceMappingsFromList(v cue.Value) ([]*api.DeviceMapping, error) {
 }
 
 func DeviceMappingFromValue(name string, v cue.Value) (*api.DeviceMapping, error) {
+	var errs error
+
 	if out, err := DeviceMappingFromString(name, v); err == nil {
 		return out, nil
+	} else {
+		errs = multierror.Append(errs, err)
 	}
 
 	if out, err := DeviceMappingFromStruct(name, v); err == nil {
 		return out, nil
+	} else {
+		errs = multierror.Append(errs, err)
 	}
 
-	return nil, ErrUnexpectedSpec
+	return nil, errs
 }
 
 func DeviceMappingFromString(_ string, v cue.Value) (*api.DeviceMapping, error) {

@@ -3,6 +3,7 @@ package config
 import (
 	"cuelang.org/go/cue"
 	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
+	"github.com/hashicorp/go-multierror"
 )
 
 func BackdropsFromValue(v cue.Value) (map[string]*api.Backdrop, error) {
@@ -80,22 +81,20 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 	}
 
 	if p, ok := property(v, "image"); ok {
-		if n, err := StringFromValue(p); err == nil {
-			out.ImageId = n
-		} else if b, err := BuildInfoFromStruct(p); err == nil {
-			out.BuildInfo = b
+		if n, b, err := ImageOrBuildInfoFromValue(p); err != nil {
+			return nil, err
 		} else {
-			return nil, ErrUnexpectedSpec
+			out.ImageId = n
+			out.BuildInfo = b
 		}
 	}
 
 	if p, ok := property(v, "build"); ok {
-		if n, err := StringFromValue(p); err == nil {
-			out.ImageId = n
-		} else if b, err := BuildInfoFromStruct(p); err == nil {
-			out.BuildInfo = b
+		if n, b, err := ImageOrBuildInfoFromValue(p); err != nil {
+			return nil, err
 		} else {
-			return nil, ErrUnexpectedSpec
+			out.ImageId = n
+			out.BuildInfo = b
 		}
 	}
 
@@ -156,4 +155,22 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 	}
 
 	return out, nil
+}
+
+func ImageOrBuildInfoFromValue(v cue.Value) (string, *api.BuildInfo, error) {
+	var errs error
+
+	if out, err := StringFromValue(v); err == nil {
+		return out, nil, nil
+	} else {
+		errs = multierror.Append(errs, err)
+	}
+
+	if out, err := BuildInfoFromStruct(v); err == nil {
+		return "", out, nil
+	} else {
+		errs = multierror.Append(errs, err)
+	}
+
+	return "", nil, errs
 }

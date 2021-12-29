@@ -4,18 +4,25 @@ import (
 	"cuelang.org/go/cue"
 	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
 	"github.com/dodo-cli/dodo-core/pkg/config"
+	"github.com/hashicorp/go-multierror"
 )
 
 func EnvironmentVariablesFromValue(v cue.Value) ([]*api.EnvironmentVariable, error) {
+	var errs error
+
 	if out, err := EnvironmentVariablesFromMap(v); err == nil {
 		return out, nil
+	} else {
+		errs = multierror.Append(errs, err)
 	}
 
 	if out, err := EnvironmentVariablesFromList(v); err == nil {
 		return out, nil
+	} else {
+		errs = multierror.Append(errs, err)
 	}
 
-	return nil, ErrUnexpectedSpec
+	return nil, errs
 }
 
 func EnvironmentVariablesFromMap(v cue.Value) ([]*api.EnvironmentVariable, error) {
@@ -50,15 +57,21 @@ func EnvironmentVariablesFromList(v cue.Value) ([]*api.EnvironmentVariable, erro
 }
 
 func EnvironmentVariableFromValue(name string, v cue.Value) (*api.EnvironmentVariable, error) {
+	var errs error
+
 	if out, err := EnvironmentVariableFromString(name, v); err == nil {
 		return out, err
+	} else {
+		errs = multierror.Append(errs, err)
 	}
 
 	if out, err := EnvironmentVariableFromStruct(name, v); err == nil {
 		return out, err
+	} else {
+		errs = multierror.Append(errs, err)
 	}
 
-	return nil, ErrUnexpectedSpec
+	return nil, errs
 }
 
 func EnvironmentVariableFromString(_ string, v cue.Value) (*api.EnvironmentVariable, error) {
