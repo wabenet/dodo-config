@@ -2,6 +2,8 @@
 backdrops:
   test_all_defaults: {}
 
+  test-minus: {}
+
   test_full_configs:
     aliases: [test_alias]
     image: testimage

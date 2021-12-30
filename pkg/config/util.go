@@ -2,6 +2,7 @@ package config
 
 import (
 	"cuelang.org/go/cue"
+	"strings"
 )
 
 func StringFromValue(v cue.Value) (string, error) {
@@ -50,7 +51,12 @@ func eachInMap(v cue.Value, f func(string, cue.Value) error) error {
 	}
 
 	for iter.Next() {
-		name := iter.Selector().String()
+		// CUE selector is supposed an unambigous path selector in the
+		// map, not just the key. So it might be quoted.
+		// FIXME: We simply trim the quotes here, to get the map key from
+		// the selector, which is kinda hacky and will probably cause
+		// trouble later
+		name := strings.Trim(iter.Selector().String(), `"`)
 
 		if err := f(name, iter.Value()); err != nil {
 			return err

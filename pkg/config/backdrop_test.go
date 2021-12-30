@@ -16,6 +16,16 @@ func TestAllDefaults(t *testing.T) {
 	assert.True(t, ok)
 }
 
+func TestMinus(t *testing.T) {
+	cfg, err := config.ParseConfig("test/dodo.yaml")
+
+	assert.Nil(t, err)
+
+	_, ok := cfg.Backdrops["test-minus"]
+	assert.True(t, ok)
+}
+
+
 func TestBasicBackdrop(t *testing.T) {
 	cfg, err := config.ParseConfig("test/dodo.yaml")
 
