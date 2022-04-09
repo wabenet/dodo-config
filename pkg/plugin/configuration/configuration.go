@@ -5,9 +5,9 @@ import (
 
 	"github.com/dodo-cli/dodo-config/pkg/config"
 	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
+	core "github.com/dodo-cli/dodo-core/pkg/config"
 	"github.com/dodo-cli/dodo-core/pkg/plugin"
 	"github.com/dodo-cli/dodo-core/pkg/plugin/configuration"
-	"github.com/oclaussen/go-gimme/configfiles"
 )
 
 const name = "config"
@@ -41,18 +41,7 @@ func (p *Configuration) get() (map[string]*api.Backdrop, error) {
 		return p.backdrops, nil
 	}
 
-	filenames := []string{}
-	configfiles.GimmeConfigFiles(&configfiles.Options{
-		Name:                      "dodo",
-		Extensions:                []string{"yaml", "yml", "json"},
-		IncludeWorkingDirectories: true,
-		Filter: func(configFile *configfiles.ConfigFile) bool {
-			filenames = append(filenames, configFile.Path)
-			return false
-		},
-	})
-
-	backdrops, err := config.GetAllBackdrops(filenames...)
+	backdrops, err := config.GetAllBackdrops(core.GetConfigFiles()...)
 	if err != nil {
 		return nil, err
 	}

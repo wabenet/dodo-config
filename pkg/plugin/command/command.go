@@ -10,10 +10,10 @@ import (
 	"cuelang.org/go/cue/errors"
 	"github.com/dodo-cli/dodo-config/pkg/config"
 	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
+	core "github.com/dodo-cli/dodo-core/pkg/config"
 	"github.com/dodo-cli/dodo-core/pkg/plugin"
 	"github.com/dodo-cli/dodo-core/pkg/plugin/command"
 	log "github.com/hashicorp/go-hclog"
-	"github.com/oclaussen/go-gimme/configfiles"
 	"github.com/spf13/cobra"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
@@ -68,18 +68,7 @@ func NewListCommand() *cobra.Command {
 		DisableFlagsInUseLine: true,
 		SilenceUsage:          true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			filenames := []string{}
-			configfiles.GimmeConfigFiles(&configfiles.Options{
-				Name:                      "dodo",
-				Extensions:                []string{"yaml", "yml", "json"},
-				IncludeWorkingDirectories: true,
-				Filter: func(configFile *configfiles.ConfigFile) bool {
-					filenames = append(filenames, configFile.Path)
-					return false
-				},
-			})
-
-			backdrops, err := config.GetAllBackdrops(filenames...)
+			backdrops, err := config.GetAllBackdrops(core.GetConfigFiles()...)
 			if err != nil {
 				log.L().Error(err.Error())
 			}
