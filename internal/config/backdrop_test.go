@@ -3,7 +3,7 @@ package config_test
 import (
 	"testing"
 
-	"github.com/dodo-cli/dodo-config/pkg/config"
+	"github.com/dodo-cli/dodo-config/internal/config"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,7 +24,6 @@ func TestMinus(t *testing.T) {
 	_, ok := cfg.Backdrops["test-minus"]
 	assert.True(t, ok)
 }
-
 
 func TestBasicBackdrop(t *testing.T) {
 	cfg, err := config.ParseConfig("test/dodo.yaml")

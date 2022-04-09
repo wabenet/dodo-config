@@ -3,8 +3,8 @@ package plugin
 import (
 	"os"
 
-	"github.com/dodo-cli/dodo-config/pkg/plugin/command"
-	"github.com/dodo-cli/dodo-config/pkg/plugin/configuration"
+	"github.com/dodo-cli/dodo-config/internal/plugin/command"
+	"github.com/dodo-cli/dodo-config/internal/plugin/configuration"
 	"github.com/dodo-cli/dodo-core/pkg/plugin"
 )
 

@@ -3,7 +3,7 @@ package config_test
 import (
 	"testing"
 
-	"github.com/dodo-cli/dodo-config/pkg/config"
+	"github.com/dodo-cli/dodo-config/internal/config"
 	"github.com/stretchr/testify/assert"
 )
 
