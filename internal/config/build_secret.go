@@ -2,6 +2,7 @@ package config
 
 import (
 	"cuelang.org/go/cue"
+	"github.com/dodo-cli/dodo-config/pkg/cuetils"
 	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
 	"github.com/hashicorp/go-multierror"
 )
@@ -27,7 +28,7 @@ func BuildSecretsFromValue(v cue.Value) ([]*api.BuildSecret, error) {
 func BuildSecretsFromMap(v cue.Value) ([]*api.BuildSecret, error) {
 	out := []*api.BuildSecret{}
 
-	err := eachInMap(v, func(name string, v cue.Value) error {
+	err := cuetils.IterMap(v, func(name string, v cue.Value) error {
 		r, err := BuildSecretFromValue(name, v)
 		if err == nil {
 			out = append(out, r)
@@ -43,7 +44,7 @@ func BuildSecretsFromMap(v cue.Value) ([]*api.BuildSecret, error) {
 func BuildSecretsFromList(v cue.Value) ([]*api.BuildSecret, error) {
 	out := []*api.BuildSecret{}
 
-	err := eachInList(v, func(v cue.Value) error {
+	err := cuetils.IterList(v, func(v cue.Value) error {
 		r, err := BuildSecretFromValue("", v)
 		if err == nil {
 			out = append(out, r)
@@ -70,7 +71,7 @@ func BuildSecretFromValue(name string, v cue.Value) (*api.BuildSecret, error) {
 func BuildSecretFromStruct(name string, v cue.Value) (*api.BuildSecret, error) {
 	out := &api.BuildSecret{Id: name}
 
-	if p, ok := property(v, "id"); ok {
+	if p, ok := cuetils.Get(v, "id"); ok {
 		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -78,7 +79,7 @@ func BuildSecretFromStruct(name string, v cue.Value) (*api.BuildSecret, error) {
 		}
 	}
 
-	if p, ok := property(v, "path"); ok {
+	if p, ok := cuetils.Get(v, "path"); ok {
 		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {

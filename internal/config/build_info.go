@@ -2,13 +2,14 @@ package config
 
 import (
 	"cuelang.org/go/cue"
+	"github.com/dodo-cli/dodo-config/pkg/cuetils"
 	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
 )
 
 func BuildInfoFromStruct(v cue.Value) (*api.BuildInfo, error) {
 	out := &api.BuildInfo{}
 
-	if p, ok := property(v, "name"); ok {
+	if p, ok := cuetils.Get(v, "name"); ok {
 		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -16,7 +17,7 @@ func BuildInfoFromStruct(v cue.Value) (*api.BuildInfo, error) {
 		}
 	}
 
-	if p, ok := property(v, "builder"); ok {
+	if p, ok := cuetils.Get(v, "builder"); ok {
 		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -24,7 +25,7 @@ func BuildInfoFromStruct(v cue.Value) (*api.BuildInfo, error) {
 		}
 	}
 
-	if p, ok := property(v, "context"); ok {
+	if p, ok := cuetils.Get(v, "context"); ok {
 		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -32,7 +33,7 @@ func BuildInfoFromStruct(v cue.Value) (*api.BuildInfo, error) {
 		}
 	}
 
-	if p, ok := property(v, "dockerfile"); ok {
+	if p, ok := cuetils.Get(v, "dockerfile"); ok {
 		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -40,7 +41,7 @@ func BuildInfoFromStruct(v cue.Value) (*api.BuildInfo, error) {
 		}
 	}
 
-	if p, ok := property(v, "steps"); ok {
+	if p, ok := cuetils.Get(v, "steps"); ok {
 		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -48,7 +49,7 @@ func BuildInfoFromStruct(v cue.Value) (*api.BuildInfo, error) {
 		}
 	}
 
-	if p, ok := property(v, "dependencies"); ok {
+	if p, ok := cuetils.Get(v, "dependencies"); ok {
 		if deps, err := StringListFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -56,7 +57,7 @@ func BuildInfoFromStruct(v cue.Value) (*api.BuildInfo, error) {
 		}
 	}
 
-	if p, ok := property(v, "arguments"); ok {
+	if p, ok := cuetils.Get(v, "arguments"); ok {
 		if bas, err := BuildArgumentsFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -64,7 +65,7 @@ func BuildInfoFromStruct(v cue.Value) (*api.BuildInfo, error) {
 		}
 	}
 
-	if p, ok := property(v, "secrets"); ok {
+	if p, ok := cuetils.Get(v, "secrets"); ok {
 		if bss, err := BuildSecretsFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -72,7 +73,7 @@ func BuildInfoFromStruct(v cue.Value) (*api.BuildInfo, error) {
 		}
 	}
 
-	if p, ok := property(v, "ssh_agents"); ok {
+	if p, ok := cuetils.Get(v, "ssh_agents"); ok {
 		if bsa, err := BuildSSHAgentsFromValue(p); err != nil {
 			return nil, err
 		} else {

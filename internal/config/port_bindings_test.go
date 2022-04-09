@@ -3,12 +3,11 @@ package config_test
 import (
 	"testing"
 
-	"github.com/dodo-cli/dodo-config/internal/config"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestFullPortBindings(t *testing.T) {
-	cfg, err := config.ParseConfig("test/dodo.yaml")
+	cfg, err := ParseTestConfig()
 	assert.Nil(t, err)
 
 	backdrop, ok := cfg.Backdrops["test_full_configs"]
@@ -28,7 +27,7 @@ func TestFullPortBindings(t *testing.T) {
 }
 
 func TestPortBindingsWithList(t *testing.T) {
-	cfg, err := config.ParseConfig("test/dodo.yaml")
+	cfg, err := ParseTestConfig()
 	assert.Nil(t, err)
 
 	backdrop, ok := cfg.Backdrops["test_with_lists"]

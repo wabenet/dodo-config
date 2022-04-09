@@ -2,6 +2,7 @@ package config
 
 import (
 	"cuelang.org/go/cue"
+	"github.com/dodo-cli/dodo-config/pkg/cuetils"
 	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
 	"github.com/hashicorp/go-multierror"
 )
@@ -13,7 +14,7 @@ func BackdropsFromValue(v cue.Value) (map[string]*api.Backdrop, error) {
 func BackdropsFromMap(v cue.Value) (map[string]*api.Backdrop, error) {
 	out := map[string]*api.Backdrop{}
 
-	err := eachInMap(v, func(name string, v cue.Value) error {
+	err := cuetils.IterMap(v, func(name string, v cue.Value) error {
 		r, err := BackdropFromStruct(name, v)
 		if err == nil {
 			out[name] = r
@@ -32,7 +33,7 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 		Entrypoint: &api.Entrypoint{},
 	}
 
-	if p, ok := property(v, "name"); ok {
+	if p, ok := cuetils.Get(v, "name"); ok {
 		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -40,7 +41,7 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 		}
 	}
 
-	if p, ok := property(v, "container_name"); ok {
+	if p, ok := cuetils.Get(v, "container_name"); ok {
 		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -48,7 +49,7 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 		}
 	}
 
-	if p, ok := property(v, "runtime"); ok {
+	if p, ok := cuetils.Get(v, "runtime"); ok {
 		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -56,7 +57,7 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 		}
 	}
 
-	if p, ok := property(v, "script"); ok {
+	if p, ok := cuetils.Get(v, "script"); ok {
 		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -64,7 +65,7 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 		}
 	}
 
-	if p, ok := property(v, "user"); ok {
+	if p, ok := cuetils.Get(v, "user"); ok {
 		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -72,7 +73,7 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 		}
 	}
 
-	if p, ok := property(v, "working_dir"); ok {
+	if p, ok := cuetils.Get(v, "working_dir"); ok {
 		if n, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -80,7 +81,7 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 		}
 	}
 
-	if p, ok := property(v, "image"); ok {
+	if p, ok := cuetils.Get(v, "image"); ok {
 		if n, b, err := ImageOrBuildInfoFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -89,7 +90,7 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 		}
 	}
 
-	if p, ok := property(v, "build"); ok {
+	if p, ok := cuetils.Get(v, "build"); ok {
 		if n, b, err := ImageOrBuildInfoFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -98,7 +99,7 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 		}
 	}
 
-	if p, ok := property(v, "aliases"); ok {
+	if p, ok := cuetils.Get(v, "aliases"); ok {
 		if as, err := StringListFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -106,7 +107,7 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 		}
 	}
 
-	if p, ok := property(v, "capabilities"); ok {
+	if p, ok := cuetils.Get(v, "capabilities"); ok {
 		if as, err := StringListFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -114,7 +115,7 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 		}
 	}
 
-	if p, ok := property(v, "interpreter"); ok {
+	if p, ok := cuetils.Get(v, "interpreter"); ok {
 		if as, err := StringListFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -122,7 +123,7 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 		}
 	}
 
-	if p, ok := property(v, "environment"); ok {
+	if p, ok := cuetils.Get(v, "environment"); ok {
 		if env, err := EnvironmentVariablesFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -130,7 +131,7 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 		}
 	}
 
-	if p, ok := property(v, "volumes"); ok {
+	if p, ok := cuetils.Get(v, "volumes"); ok {
 		if vs, err := VolumeMountsFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -138,7 +139,7 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 		}
 	}
 
-	if p, ok := property(v, "ports"); ok {
+	if p, ok := cuetils.Get(v, "ports"); ok {
 		if ps, err := PortBindingsFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -146,7 +147,7 @@ func BackdropFromStruct(name string, v cue.Value) (*api.Backdrop, error) {
 		}
 	}
 
-	if p, ok := property(v, "devices"); ok {
+	if p, ok := cuetils.Get(v, "devices"); ok {
 		if ds, err := DeviceMappingsFromValue(p); err != nil {
 			return nil, err
 		} else {

@@ -2,6 +2,7 @@ package config
 
 import (
 	"cuelang.org/go/cue"
+	"github.com/dodo-cli/dodo-config/pkg/cuetils"
 	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
 	"github.com/dodo-cli/dodo-core/pkg/config"
 	"github.com/hashicorp/go-multierror"
@@ -28,7 +29,7 @@ func DeviceMappingsFromValue(v cue.Value) ([]*api.DeviceMapping, error) {
 func DeviceMappingsFromMap(v cue.Value) ([]*api.DeviceMapping, error) {
 	out := []*api.DeviceMapping{}
 
-	err := eachInMap(v, func(name string, v cue.Value) error {
+	err := cuetils.IterMap(v, func(name string, v cue.Value) error {
 		r, err := DeviceMappingFromValue(name, v)
 		if err == nil {
 			out = append(out, r)
@@ -44,7 +45,7 @@ func DeviceMappingsFromMap(v cue.Value) ([]*api.DeviceMapping, error) {
 func DeviceMappingsFromList(v cue.Value) ([]*api.DeviceMapping, error) {
 	out := []*api.DeviceMapping{}
 
-	err := eachInList(v, func(v cue.Value) error {
+	err := cuetils.IterList(v, func(v cue.Value) error {
 		r, err := DeviceMappingFromValue("", v)
 		if err == nil {
 			out = append(out, r)
@@ -86,7 +87,7 @@ func DeviceMappingFromString(_ string, v cue.Value) (*api.DeviceMapping, error) 
 func DeviceMappingFromStruct(name string, v cue.Value) (*api.DeviceMapping, error) {
 	out := &api.DeviceMapping{Target: name}
 
-	if p, ok := property(v, "target"); ok {
+	if p, ok := cuetils.Get(v, "target"); ok {
 		if v, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -94,7 +95,7 @@ func DeviceMappingFromStruct(name string, v cue.Value) (*api.DeviceMapping, erro
 		}
 	}
 
-	if p, ok := property(v, "source"); ok {
+	if p, ok := cuetils.Get(v, "source"); ok {
 		if v, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -102,7 +103,7 @@ func DeviceMappingFromStruct(name string, v cue.Value) (*api.DeviceMapping, erro
 		}
 	}
 
-	if p, ok := property(v, "permissions"); ok {
+	if p, ok := cuetils.Get(v, "permissions"); ok {
 		if v, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -110,7 +111,7 @@ func DeviceMappingFromStruct(name string, v cue.Value) (*api.DeviceMapping, erro
 		}
 	}
 
-	if p, ok := property(v, "cgroup_rule"); ok {
+	if p, ok := cuetils.Get(v, "cgroup_rule"); ok {
 		if v, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {

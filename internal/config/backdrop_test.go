@@ -3,12 +3,11 @@ package config_test
 import (
 	"testing"
 
-	"github.com/dodo-cli/dodo-config/internal/config"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestAllDefaults(t *testing.T) {
-	cfg, err := config.ParseConfig("test/dodo.yaml")
+	cfg, err := ParseTestConfig()
 
 	assert.Nil(t, err)
 
@@ -17,7 +16,7 @@ func TestAllDefaults(t *testing.T) {
 }
 
 func TestMinus(t *testing.T) {
-	cfg, err := config.ParseConfig("test/dodo.yaml")
+	cfg, err := ParseTestConfig()
 
 	assert.Nil(t, err)
 
@@ -26,7 +25,7 @@ func TestMinus(t *testing.T) {
 }
 
 func TestBasicBackdrop(t *testing.T) {
-	cfg, err := config.ParseConfig("test/dodo.yaml")
+	cfg, err := ParseTestConfig()
 
 	assert.Nil(t, err)
 

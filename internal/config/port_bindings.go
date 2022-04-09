@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"cuelang.org/go/cue"
+	"github.com/dodo-cli/dodo-config/pkg/cuetils"
 	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
 	"github.com/dodo-cli/dodo-core/pkg/config"
 	"github.com/hashicorp/go-multierror"
@@ -30,7 +31,7 @@ func PortBindingsFromValue(v cue.Value) ([]*api.PortBinding, error) {
 func PortBindingsFromMap(v cue.Value) ([]*api.PortBinding, error) {
 	out := []*api.PortBinding{}
 
-	err := eachInMap(v, func(name string, v cue.Value) error {
+	err := cuetils.IterMap(v, func(name string, v cue.Value) error {
 		r, err := PortBindingFromValue(name, v)
 		if err == nil {
 			out = append(out, r)
@@ -46,7 +47,7 @@ func PortBindingsFromMap(v cue.Value) ([]*api.PortBinding, error) {
 func PortBindingsFromList(v cue.Value) ([]*api.PortBinding, error) {
 	out := []*api.PortBinding{}
 
-	err := eachInList(v, func(v cue.Value) error {
+	err := cuetils.IterList(v, func(v cue.Value) error {
 		r, err := PortBindingFromValue("", v)
 		if err == nil {
 			out = append(out, r)
@@ -88,7 +89,7 @@ func PortBindingFromString(_ string, v cue.Value) (*api.PortBinding, error) {
 func PortBindingFromStruct(name string, v cue.Value) (*api.PortBinding, error) {
 	out := &api.PortBinding{Target: name}
 
-	if p, ok := property(v, "target"); ok {
+	if p, ok := cuetils.Get(v, "target"); ok {
 		if v, err := StringFromValue(p); err == nil {
 			out.Target = v
 		} else if v, err := p.Int64(); err == nil {
@@ -96,7 +97,7 @@ func PortBindingFromStruct(name string, v cue.Value) (*api.PortBinding, error) {
 		}
 	}
 
-	if p, ok := property(v, "publish"); ok {
+	if p, ok := cuetils.Get(v, "publish"); ok {
 		if v, err := StringFromValue(p); err == nil {
 			out.Published = v
 		} else if v, err := p.Int64(); err == nil {
@@ -104,7 +105,7 @@ func PortBindingFromStruct(name string, v cue.Value) (*api.PortBinding, error) {
 		}
 	}
 
-	if p, ok := property(v, "protocol"); ok {
+	if p, ok := cuetils.Get(v, "protocol"); ok {
 		if v, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -112,7 +113,7 @@ func PortBindingFromStruct(name string, v cue.Value) (*api.PortBinding, error) {
 		}
 	}
 
-	if p, ok := property(v, "host_ip"); ok {
+	if p, ok := cuetils.Get(v, "host_ip"); ok {
 		if v, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {

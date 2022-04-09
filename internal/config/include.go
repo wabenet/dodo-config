@@ -2,6 +2,7 @@ package config
 
 import (
 	"cuelang.org/go/cue"
+	"github.com/dodo-cli/dodo-config/pkg/cuetils"
 	"github.com/hashicorp/go-multierror"
 )
 
@@ -20,8 +21,8 @@ func IncludesFromValue(v cue.Value) ([]string, error) {
 func IncludesFromList(v cue.Value) ([]string, error) {
 	out := []string{}
 
-	err := eachInList(v, func(v cue.Value) error {
-		if p, ok := property(v, "file"); ok {
+	err := cuetils.IterList(v, func(v cue.Value) error {
+		if p, ok := cuetils.Get(v, "file"); ok {
 			f, err := StringFromValue(p)
 			if err == nil {
 				out = append(out, f)

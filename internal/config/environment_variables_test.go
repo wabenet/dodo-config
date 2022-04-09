@@ -3,12 +3,11 @@ package config_test
 import (
 	"testing"
 
-	"github.com/dodo-cli/dodo-config/internal/config"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestFullEnvironment(t *testing.T) {
-	cfg, err := config.ParseConfig("test/dodo.yaml")
+	cfg, err := ParseTestConfig()
 	assert.Nil(t, err)
 
 	backdrop, ok := cfg.Backdrops["test_full_configs"]
@@ -29,7 +28,7 @@ func TestFullEnvironment(t *testing.T) {
 }
 
 func TestPartialEnvironment(t *testing.T) {
-	cfg, err := config.ParseConfig("test/dodo.yaml")
+	cfg, err := ParseTestConfig()
 	assert.Nil(t, err)
 
 	backdrop, ok := cfg.Backdrops["test_full_configs"]
@@ -48,7 +47,7 @@ func TestPartialEnvironment(t *testing.T) {
 }
 
 func TestEnvironmentWithList(t *testing.T) {
-	cfg, err := config.ParseConfig("test/dodo.yaml")
+	cfg, err := ParseTestConfig()
 	assert.Nil(t, err)
 
 	backdrop, ok := cfg.Backdrops["test_with_lists"]

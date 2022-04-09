@@ -2,6 +2,7 @@ package config
 
 import (
 	"cuelang.org/go/cue"
+	"github.com/dodo-cli/dodo-config/pkg/cuetils"
 	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
 	"github.com/dodo-cli/dodo-core/pkg/config"
 	"github.com/hashicorp/go-multierror"
@@ -28,7 +29,7 @@ func EnvironmentVariablesFromValue(v cue.Value) ([]*api.EnvironmentVariable, err
 func EnvironmentVariablesFromMap(v cue.Value) ([]*api.EnvironmentVariable, error) {
 	out := []*api.EnvironmentVariable{}
 
-	err := eachInMap(v, func(name string, v cue.Value) error {
+	err := cuetils.IterMap(v, func(name string, v cue.Value) error {
 		r, err := EnvironmentVariableFromValue(name, v)
 		if err == nil {
 			out = append(out, r)
@@ -44,7 +45,7 @@ func EnvironmentVariablesFromMap(v cue.Value) ([]*api.EnvironmentVariable, error
 func EnvironmentVariablesFromList(v cue.Value) ([]*api.EnvironmentVariable, error) {
 	out := []*api.EnvironmentVariable{}
 
-	err := eachInList(v, func(v cue.Value) error {
+	err := cuetils.IterList(v, func(v cue.Value) error {
 		r, err := EnvironmentVariableFromValue("", v)
 		if err == nil {
 			out = append(out, r)
@@ -86,7 +87,7 @@ func EnvironmentVariableFromString(_ string, v cue.Value) (*api.EnvironmentVaria
 func EnvironmentVariableFromStruct(name string, v cue.Value) (*api.EnvironmentVariable, error) {
 	out := &api.EnvironmentVariable{Key: name}
 
-	if p, ok := property(v, "name"); ok {
+	if p, ok := cuetils.Get(v, "name"); ok {
 		if v, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -94,7 +95,7 @@ func EnvironmentVariableFromStruct(name string, v cue.Value) (*api.EnvironmentVa
 		}
 	}
 
-	if p, ok := property(v, "value"); ok {
+	if p, ok := cuetils.Get(v, "value"); ok {
 		if v, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {

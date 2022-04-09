@@ -2,6 +2,7 @@ package config
 
 import (
 	"cuelang.org/go/cue"
+	"github.com/dodo-cli/dodo-config/pkg/cuetils"
 	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
 	"github.com/dodo-cli/dodo-core/pkg/config"
 	"github.com/hashicorp/go-multierror"
@@ -28,7 +29,7 @@ func VolumeMountsFromValue(v cue.Value) ([]*api.VolumeMount, error) {
 func VolumeMountsFromMap(v cue.Value) ([]*api.VolumeMount, error) {
 	out := []*api.VolumeMount{}
 
-	err := eachInMap(v, func(name string, v cue.Value) error {
+	err := cuetils.IterMap(v, func(name string, v cue.Value) error {
 		r, err := VolumeMountFromValue(name, v)
 		if err == nil {
 			out = append(out, r)
@@ -44,7 +45,7 @@ func VolumeMountsFromMap(v cue.Value) ([]*api.VolumeMount, error) {
 func VolumeMountsFromList(v cue.Value) ([]*api.VolumeMount, error) {
 	out := []*api.VolumeMount{}
 
-	err := eachInList(v, func(v cue.Value) error {
+	err := cuetils.IterList(v, func(v cue.Value) error {
 		r, err := VolumeMountFromValue("", v)
 		if err == nil {
 			out = append(out, r)
@@ -86,7 +87,7 @@ func VolumeMountFromString(_ string, v cue.Value) (*api.VolumeMount, error) {
 func VolumeMountFromStruct(name string, v cue.Value) (*api.VolumeMount, error) {
 	out := &api.VolumeMount{Source: name}
 
-	if p, ok := property(v, "source"); ok {
+	if p, ok := cuetils.Get(v, "source"); ok {
 		if v, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -94,7 +95,7 @@ func VolumeMountFromStruct(name string, v cue.Value) (*api.VolumeMount, error) {
 		}
 	}
 
-	if p, ok := property(v, "target"); ok {
+	if p, ok := cuetils.Get(v, "target"); ok {
 		if v, err := StringFromValue(p); err != nil {
 			return nil, err
 		} else {
@@ -102,7 +103,7 @@ func VolumeMountFromStruct(name string, v cue.Value) (*api.VolumeMount, error) {
 		}
 	}
 
-	if p, ok := property(v, "readonly"); ok {
+	if p, ok := cuetils.Get(v, "readonly"); ok {
 		if v, err := p.Bool(); err != nil {
 			return nil, err
 		} else {
