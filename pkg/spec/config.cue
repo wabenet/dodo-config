@@ -1,11 +1,5 @@
 package spec
 
-include: [...#Include] | *[]
-
-#Include: {
-  file: string
-}
-
 backdrops: [string]: #Backdrop
 
 #Backdrop: {

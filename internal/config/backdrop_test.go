@@ -3,33 +3,34 @@ package config_test
 import (
 	"testing"
 
+	"github.com/dodo-cli/dodo-config/internal/config"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestAllDefaults(t *testing.T) {
-	cfg, err := ParseTestConfig()
+	cfg, err := config.GetAllBackdrops("test/dodo.yaml")
 
 	assert.Nil(t, err)
 
-	_, ok := cfg.Backdrops["test_all_defaults"]
+	_, ok := cfg["test_all_defaults"]
 	assert.True(t, ok)
 }
 
 func TestMinus(t *testing.T) {
-	cfg, err := ParseTestConfig()
+	cfg, err := config.GetAllBackdrops("test/dodo.yaml")
 
 	assert.Nil(t, err)
 
-	_, ok := cfg.Backdrops["test-minus"]
+	_, ok := cfg["test-minus"]
 	assert.True(t, ok)
 }
 
 func TestBasicBackdrop(t *testing.T) {
-	cfg, err := ParseTestConfig()
+	cfg, err := config.GetAllBackdrops("test/dodo.yaml")
 
 	assert.Nil(t, err)
 
-	backdrop, ok := cfg.Backdrops["test_full_configs"]
+	backdrop, ok := cfg["test_full_configs"]
 
 	assert.True(t, ok)
 	assert.Equal(t, "testimage", backdrop.ImageId)

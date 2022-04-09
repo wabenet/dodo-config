@@ -3,15 +3,16 @@ package config_test
 import (
 	"testing"
 
+	"github.com/dodo-cli/dodo-config/internal/config"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestBuildInfo(t *testing.T) {
-	cfg, err := ParseTestConfig()
+	cfg, err := config.GetAllBackdrops("test/dodo.yaml")
 
 	assert.Nil(t, err)
 
-	backdrop, ok := cfg.Backdrops["test_build"]
+	backdrop, ok := cfg["test_build"]
 	assert.True(t, ok)
 
 	build := backdrop.BuildInfo

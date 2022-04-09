@@ -3,14 +3,15 @@ package config_test
 import (
 	"testing"
 
+	"github.com/dodo-cli/dodo-config/internal/config"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestFullEnvironment(t *testing.T) {
-	cfg, err := ParseTestConfig()
+	cfg, err := config.GetAllBackdrops("test/dodo.yaml")
 	assert.Nil(t, err)
 
-	backdrop, ok := cfg.Backdrops["test_full_configs"]
+	backdrop, ok := cfg["test_full_configs"]
 
 	assert.True(t, ok)
 	assert.NotEmpty(t, backdrop.Environment)
@@ -28,10 +29,10 @@ func TestFullEnvironment(t *testing.T) {
 }
 
 func TestPartialEnvironment(t *testing.T) {
-	cfg, err := ParseTestConfig()
+	cfg, err := config.GetAllBackdrops("test/dodo.yaml")
 	assert.Nil(t, err)
 
-	backdrop, ok := cfg.Backdrops["test_full_configs"]
+	backdrop, ok := cfg["test_full_configs"]
 
 	assert.True(t, ok)
 	assert.NotEmpty(t, backdrop.Environment)
@@ -47,10 +48,10 @@ func TestPartialEnvironment(t *testing.T) {
 }
 
 func TestEnvironmentWithList(t *testing.T) {
-	cfg, err := ParseTestConfig()
+	cfg, err := config.GetAllBackdrops("test/dodo.yaml")
 	assert.Nil(t, err)
 
-	backdrop, ok := cfg.Backdrops["test_with_lists"]
+	backdrop, ok := cfg["test_with_lists"]
 
 	assert.True(t, ok)
 	assert.Equal(t, 2, len(backdrop.Environment))

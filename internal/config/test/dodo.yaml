@@ -63,7 +63,3 @@ backdrops:
       dockerfile: /some/other/path
       steps: |
         FROM foo
-        
-
-include:
-  - file: "{{ currentDir }}/included.yaml"

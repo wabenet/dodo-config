@@ -3,14 +3,15 @@ package config_test
 import (
 	"testing"
 
+	"github.com/dodo-cli/dodo-config/internal/config"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestFullVolume(t *testing.T) {
-	cfg, err := ParseTestConfig()
+	cfg, err := config.GetAllBackdrops("test/dodo.yaml")
 	assert.Nil(t, err)
 
-	backdrop, ok := cfg.Backdrops["test_full_configs"]
+	backdrop, ok := cfg["test_full_configs"]
 
 	assert.True(t, ok)
 	assert.NotEmpty(t, backdrop.Volumes)
@@ -28,10 +29,10 @@ func TestFullVolume(t *testing.T) {
 }
 
 func TestPartialVolume(t *testing.T) {
-	cfg, err := ParseTestConfig()
+	cfg, err := config.GetAllBackdrops("test/dodo.yaml")
 	assert.Nil(t, err)
 
-	backdrop, ok := cfg.Backdrops["test_full_configs"]
+	backdrop, ok := cfg["test_full_configs"]
 
 	assert.True(t, ok)
 	assert.NotEmpty(t, backdrop.Volumes)
@@ -46,10 +47,10 @@ func TestPartialVolume(t *testing.T) {
 }
 
 func TestVolumesWithLists(t *testing.T) {
-	cfg, err := ParseTestConfig()
+	cfg, err := config.GetAllBackdrops("test/dodo.yaml")
 	assert.Nil(t, err)
 
-	backdrop, ok := cfg.Backdrops["test_with_lists"]
+	backdrop, ok := cfg["test_with_lists"]
 
 	assert.True(t, ok)
 	assert.Equal(t, 1, len(backdrop.Volumes))
