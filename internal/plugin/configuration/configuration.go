@@ -3,11 +3,11 @@ package configuration
 import (
 	"fmt"
 
-	"github.com/dodo-cli/dodo-config/internal/config"
-	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
-	core "github.com/dodo-cli/dodo-core/pkg/config"
-	"github.com/dodo-cli/dodo-core/pkg/plugin"
-	"github.com/dodo-cli/dodo-core/pkg/plugin/configuration"
+	"github.com/wabenet/dodo-config/internal/config"
+	api "github.com/wabenet/dodo-core/api/v1alpha3"
+	core "github.com/wabenet/dodo-core/pkg/config"
+	"github.com/wabenet/dodo-core/pkg/plugin"
+	"github.com/wabenet/dodo-core/pkg/plugin/configuration"
 )
 
 const name = "config"

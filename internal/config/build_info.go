@@ -2,8 +2,8 @@ package config
 
 import (
 	"cuelang.org/go/cue"
-	"github.com/dodo-cli/dodo-config/pkg/cuetils"
-	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
+	"github.com/wabenet/dodo-config/pkg/cuetils"
+	api "github.com/wabenet/dodo-core/api/v1alpha3"
 )
 
 func BuildInfoFromStruct(v cue.Value) (*api.BuildInfo, error) {

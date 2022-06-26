@@ -8,13 +8,13 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue/errors"
-	"github.com/dodo-cli/dodo-config/internal/config"
-	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
-	core "github.com/dodo-cli/dodo-core/pkg/config"
-	"github.com/dodo-cli/dodo-core/pkg/plugin"
-	"github.com/dodo-cli/dodo-core/pkg/plugin/command"
 	log "github.com/hashicorp/go-hclog"
 	"github.com/spf13/cobra"
+	"github.com/wabenet/dodo-config/internal/config"
+	api "github.com/wabenet/dodo-core/api/v1alpha3"
+	core "github.com/wabenet/dodo-core/pkg/config"
+	"github.com/wabenet/dodo-core/pkg/plugin"
+	"github.com/wabenet/dodo-core/pkg/plugin/command"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
 )

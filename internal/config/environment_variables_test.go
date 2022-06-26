@@ -3,8 +3,8 @@ package config_test
 import (
 	"testing"
 
-	"github.com/dodo-cli/dodo-config/internal/config"
 	"github.com/stretchr/testify/assert"
+	"github.com/wabenet/dodo-config/internal/config"
 )
 
 func TestFullEnvironment(t *testing.T) {

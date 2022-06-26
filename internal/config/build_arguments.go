@@ -2,9 +2,9 @@ package config
 
 import (
 	"cuelang.org/go/cue"
-	"github.com/dodo-cli/dodo-config/pkg/cuetils"
-	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
 	"github.com/hashicorp/go-multierror"
+	"github.com/wabenet/dodo-config/pkg/cuetils"
+	api "github.com/wabenet/dodo-core/api/v1alpha3"
 )
 
 func BuildArgumentsFromValue(v cue.Value) ([]*api.BuildArgument, error) {

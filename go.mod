@@ -1,15 +1,15 @@
-module github.com/dodo-cli/dodo-config
+module github.com/wabenet/dodo-config
 
 go 1.18
 
 require (
 	cuelang.org/go v0.4.0
 	github.com/Masterminds/sprig v2.22.0+incompatible
-	github.com/dodo-cli/dodo-core v0.4.2
 	github.com/hashicorp/go-hclog v0.15.0
 	github.com/hashicorp/go-multierror v1.0.0
 	github.com/spf13/cobra v1.1.3
 	github.com/stretchr/testify v1.7.0
+	github.com/wabenet/dodo-core v0.6.0
 	golang.org/x/text v0.3.5
 )
 
@@ -56,7 +56,6 @@ require (
 	github.com/subosito/gotenv v1.2.0 // indirect
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 // indirect
 	golang.org/x/net v0.0.0-20210119194325-5f4716e94777 // indirect
-	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e // indirect
 	golang.org/x/sys v0.0.0-20220406163625-3f8b81556e12 // indirect
 	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543 // indirect
 	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect

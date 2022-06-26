@@ -3,8 +3,8 @@ package includes_test
 import (
 	"testing"
 
-	"github.com/dodo-cli/dodo-config/pkg/includes"
 	"github.com/stretchr/testify/assert"
+	"github.com/wabenet/dodo-config/pkg/includes"
 )
 
 func TestInclude(t *testing.T) {

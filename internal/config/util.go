@@ -2,7 +2,7 @@ package config
 
 import (
 	"cuelang.org/go/cue"
-	"github.com/dodo-cli/dodo-config/pkg/cuetils"
+	"github.com/wabenet/dodo-config/pkg/cuetils"
 )
 
 func StringFromValue(v cue.Value) (string, error) {

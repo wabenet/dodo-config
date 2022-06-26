@@ -3,11 +3,11 @@ package plugin
 import (
 	"os"
 
-	commandimpl "github.com/dodo-cli/dodo-config/internal/plugin/command"
-	configimpl "github.com/dodo-cli/dodo-config/internal/plugin/configuration"
-	"github.com/dodo-cli/dodo-core/pkg/plugin"
-	"github.com/dodo-cli/dodo-core/pkg/plugin/command"
-	"github.com/dodo-cli/dodo-core/pkg/plugin/configuration"
+	commandimpl "github.com/wabenet/dodo-config/internal/plugin/command"
+	configimpl "github.com/wabenet/dodo-config/internal/plugin/configuration"
+	"github.com/wabenet/dodo-core/pkg/plugin"
+	"github.com/wabenet/dodo-core/pkg/plugin/command"
+	"github.com/wabenet/dodo-core/pkg/plugin/configuration"
 )
 
 func RunMe() int {

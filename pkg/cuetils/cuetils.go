@@ -8,7 +8,7 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/encoding/yaml"
-	"github.com/dodo-cli/dodo-config/pkg/template"
+	"github.com/wabenet/dodo-config/pkg/template"
 )
 
 func Get(v cue.Value, property string) (cue.Value, bool) {

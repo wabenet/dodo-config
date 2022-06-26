@@ -11,11 +11,11 @@ following generate config:
 
 ```yaml
 plugins:
-  - import: github.com/dodo-cli/dodo-config/plugin
+  - import: github.com/wabenet/dodo-config/pkg/plugin
 ```
 
 Alternatively, you can install it as a standalone plugin by downloading the
-correct file for your system from the [releases page](https://github.com/dodo-cli/dodo-config/releases),
+correct file for your system from the [releases page](https://github.com/wabenet/dodo-config/releases),
 then copy it into the dodo plugin directory (`${HOME}/.dodo/plugins`).
 
 ## configuration

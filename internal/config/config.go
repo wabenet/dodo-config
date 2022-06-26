@@ -1,11 +1,11 @@
 package config
 
 import (
-	"github.com/dodo-cli/dodo-config/pkg/cuetils"
-	"github.com/dodo-cli/dodo-config/pkg/includes"
-	"github.com/dodo-cli/dodo-config/pkg/spec"
-	api "github.com/dodo-cli/dodo-core/api/v1alpha2"
 	"github.com/hashicorp/go-multierror"
+	"github.com/wabenet/dodo-config/pkg/cuetils"
+	"github.com/wabenet/dodo-config/pkg/includes"
+	"github.com/wabenet/dodo-config/pkg/spec"
+	api "github.com/wabenet/dodo-core/api/v1alpha3"
 )
 
 func GetAllBackdrops(filenames ...string) (map[string]*api.Backdrop, error) {
