@@ -6,7 +6,7 @@ import (
 	"cuelang.org/go/cue"
 	"github.com/hashicorp/go-multierror"
 	"github.com/wabenet/dodo-config/pkg/cuetils"
-	api "github.com/wabenet/dodo-core/api/v1alpha3"
+	api "github.com/wabenet/dodo-core/api/v1alpha4"
 	"github.com/wabenet/dodo-core/pkg/config"
 )
 

@@ -4,7 +4,7 @@ import (
 	"cuelang.org/go/cue"
 	"github.com/hashicorp/go-multierror"
 	"github.com/wabenet/dodo-config/pkg/cuetils"
-	api "github.com/wabenet/dodo-core/api/v1alpha3"
+	api "github.com/wabenet/dodo-core/api/v1alpha4"
 )
 
 func BuildSSHAgentsFromValue(v cue.Value) ([]*api.SshAgent, error) {

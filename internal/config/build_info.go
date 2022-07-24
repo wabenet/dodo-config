@@ -3,7 +3,7 @@ package config
 import (
 	"cuelang.org/go/cue"
 	"github.com/wabenet/dodo-config/pkg/cuetils"
-	api "github.com/wabenet/dodo-core/api/v1alpha3"
+	api "github.com/wabenet/dodo-core/api/v1alpha4"
 )
 
 func BuildInfoFromStruct(v cue.Value) (*api.BuildInfo, error) {

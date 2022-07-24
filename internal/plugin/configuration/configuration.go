@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/wabenet/dodo-config/internal/config"
-	api "github.com/wabenet/dodo-core/api/v1alpha3"
+	api "github.com/wabenet/dodo-core/api/v1alpha4"
 	core "github.com/wabenet/dodo-core/pkg/config"
 	"github.com/wabenet/dodo-core/pkg/plugin"
 	"github.com/wabenet/dodo-core/pkg/plugin/configuration"
@@ -35,6 +35,8 @@ func (p *Configuration) PluginInfo() *api.PluginInfo {
 func (p *Configuration) Init() (plugin.PluginConfig, error) {
 	return map[string]string{}, nil
 }
+
+func (*Configuration) Cleanup() {}
 
 func (p *Configuration) get() (map[string]*api.Backdrop, error) {
 	if p.backdrops != nil {
