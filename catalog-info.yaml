@@ -3,7 +3,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: dodo-config
-  description: Adds config parsing based on CUE to dodo
+  description: Adds support to load dodo backdrops from configuration files.
 
 spec:
   type: library
