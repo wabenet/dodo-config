@@ -75,6 +75,15 @@ func ReadYAMLFileWithSpec(spec string, filename string) (cue.Value, error) {
 		return cue.Value{}, err
 	}
 
+	// We template the source on the AST level - still not entirely sure
+	// that's a good idea.
+	// We could template the values after building with CUE, but that will
+	// proably mess too much with CUEs validation engine.
+	// We could template the source files directly before parsing, but I'm a
+	// big fan if our the sources are always valid yaml and can be validated
+	// as such - otherwise they can get really messy and it kinda defeats
+	// the point of using CUE in the first place.
+
 	yamlFile, err = template.TemplateCueAST(yamlFile)
 	if err != nil {
 		return cue.Value{}, err

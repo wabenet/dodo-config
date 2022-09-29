@@ -1,0 +1,13 @@
+---
+cwd: "{{ cwd }}"
+currentDir: "{{ currentDir }}"
+currentFile: "{{ currentFile }}"
+projectRoot: "{{ projectRoot }}"
+projectPath: "{{ projectPath }}"
+
+hello: "{{ sh `echo Hello World` }}"
+
+readfile: "{{ readFile `included.txt` }}"
+
+readfile_multiline: |
+  {{- readFile `included.txt` -}}

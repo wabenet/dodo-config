@@ -32,40 +32,61 @@ func (ctx *Context) TemplateString(input string) (string, error) {
 
 func (ctx *Context) FuncMap() template.FuncMap {
 	return template.FuncMap{
-		"user": user.Current,
-		"cwd":  os.Getwd,
-		"env":  os.Getenv,
-		"sh":   runShell,
-		"projectRoot": func() (string, error) {
-			root, _, err := findProjectRoot()
-			return root, err
-		},
-		"projectPath": func() (string, error) {
-			_, path, err := findProjectRoot()
-			return path, err
-		},
-		"currentFile": func() string {
-			return ctx.Filename
-		},
-		"currentDir": func() string {
-			return filepath.Dir(ctx.Filename)
-		},
+		"user":        user.Current,
+		"cwd":         os.Getwd,
+		"env":         os.Getenv,
+		"currentFile": ctx.currentFile,
+		"currentDir":  ctx.currentDir,
+		"sh":          ctx.runShell,
+		"readFile":    ctx.readFile,
+		"projectRoot": ctx.projectRoot,
+		"projectPath": ctx.projectPath,
 	}
 }
 
-func runShell(command string) (string, error) {
+func (ctx *Context) currentFile() string {
+	return ctx.Filename
+}
+
+func (ctx *Context) currentDir() string {
+	return filepath.Dir(ctx.Filename)
+}
+
+func (*Context) runShell(command string) (string, error) {
 	// TODO: what to do on windows?
 	var out bytes.Buffer
 
 	cmd := exec.Command("/bin/sh", "-c", command)
 	cmd.Stdout = &out
 
-	err := cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		return "", err
 	}
 
 	return out.String(), nil
+}
+
+func (ctx *Context) readFile(path string) (string, error) {
+	fullPath := filepath.Join(ctx.currentDir(), path)
+
+	b, err := os.ReadFile(fullPath)
+	if err != nil {
+		return "", err
+	}
+
+	return string(b), nil
+}
+
+func (*Context) projectRoot() (string, error) {
+	root, _, err := findProjectRoot()
+
+	return root, err
+}
+
+func (*Context) projectPath() (string, error) {
+	_, path, err := findProjectRoot()
+
+	return path, err
 }
 
 func findProjectRoot() (string, string, error) {

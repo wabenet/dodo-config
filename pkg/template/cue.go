@@ -4,6 +4,7 @@ import (
 	"reflect"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/literal"
 	log "github.com/hashicorp/go-hclog"
 )
 
@@ -23,7 +24,7 @@ func (ctx *Context) templateCueNode(node ast.Node) error {
 	// In theory we could add every CUE AST type here
 	// But that feels like it contradicts the idea of using CUE in the first place
 	// So we only template those types that specifically occur in YAML
-
+	//
 	if n, ok := node.(*ast.BasicLit); ok {
 		return ctx.templateCueBasicLit(n)
 	}
@@ -41,16 +42,42 @@ func (ctx *Context) templateCueNode(node ast.Node) error {
 	}
 
 	log.L().Warn("Declaration ignored for templating", "decl", node, "type", reflect.TypeOf(node))
-        return nil
+
+	return nil
 }
 
 func (ctx *Context) templateCueBasicLit(node *ast.BasicLit) error {
-	v, err := ctx.TemplateString(node.Value)
+	// What is happening here might be a bit weird
+	// So we check if the value is a quoted string, if yes we remove the
+	// quotes and re-quote the string after templating. Reason is, the
+	// re-quote should take care of escaping all newlines and so on that
+	// come in through templating and would otherwise just destroy the AST.
+	// We could also just always quote regardless, but that messes up
+	// non-string literals (numbers, bools).
+	// I realize this feels broken, and I'm sure there are use cases where
+	// this will fall on our feet, but it needs someone smarter than me
+	// right now to figure out how to handle this properly. I still have
+	// hope the smarter person might be future-me eventually.
+	//
+	value := node.Value
+	wasQuoted := false
+
+	if unquoted, err := literal.Unquote(value); err == nil {
+		value = unquoted
+		wasQuoted = true
+	}
+
+	templated, err := ctx.TemplateString(value)
 	if err != nil {
 		return err
 	}
 
-	node.Value = v
+	if wasQuoted {
+		templated = literal.String.Quote(templated)
+	}
+
+	node.Value = templated
+
 	return nil
 }
 

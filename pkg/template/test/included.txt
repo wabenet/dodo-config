@@ -1,0 +1,5 @@
+This file is templated into a string value
+
+It has multiple lines to confuse CUE
+
+Also, "mismatched quotes' and braces :{
