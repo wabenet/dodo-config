@@ -9,7 +9,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/spf13/cobra v1.5.0
 	github.com/stretchr/testify v1.8.0
-	github.com/wabenet/dodo-core v0.7.3
+	github.com/wabenet/dodo-core v0.7.4
 	golang.org/x/text v0.3.7
 )
 

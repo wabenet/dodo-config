@@ -249,8 +249,8 @@ github.com/stretchr/testify v1.8.0 h1:pSgiaMZlXftHpm5L7V1+rVB+AZJydKsMxsQBIJw4PK
 github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
 github.com/subosito/gotenv v1.4.1 h1:jyEFiXpy21Wm81FBN71l9VoMMV8H8jG+qIK3GCpY6Qs=
 github.com/subosito/gotenv v1.4.1/go.mod h1:ayKnFf/c6rvx/2iiLrJUk1e6plDbT3edrFNGqEflhK0=
-github.com/wabenet/dodo-core v0.7.3 h1:qcosn53cDatq342CHaGrQRjA82Bwl/pZVZLhx5WdfCg=
-github.com/wabenet/dodo-core v0.7.3/go.mod h1:5DvBkbRv/SmEK2GdpzGD/6XTr3l2R3Gl11RVjunJPOI=
+github.com/wabenet/dodo-core v0.7.4 h1:XmIOikv+NdimSDpE0sCkTWpTmrKPE01kXyZK88NVu1k=
+github.com/wabenet/dodo-core v0.7.4/go.mod h1:5DvBkbRv/SmEK2GdpzGD/6XTr3l2R3Gl11RVjunJPOI=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
