@@ -4,7 +4,7 @@ import (
 	"cuelang.org/go/cue"
 	"github.com/hashicorp/go-multierror"
 	"github.com/wabenet/dodo-config/pkg/cuetils"
-	api "github.com/wabenet/dodo-core/api/v1alpha4"
+	api "github.com/wabenet/dodo-core/api/core/v1alpha5"
 )
 
 func BuildArgumentsFromValue(v cue.Value) ([]*api.BuildArgument, error) {
