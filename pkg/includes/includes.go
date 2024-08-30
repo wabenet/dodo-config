@@ -2,6 +2,7 @@ package includes
 
 import (
 	_ "embed"
+	"fmt"
 
 	"cuelang.org/go/cue"
 	"github.com/hashicorp/go-multierror"
@@ -10,6 +11,22 @@ import (
 
 //go:embed includes.cue
 var CueSpec string
+
+type include struct {
+	file string
+}
+
+func includeFromStruct(_ string, v cue.Value) (*include, error) {
+	out := &include{}
+
+	if p, ok, err := cuetils.Extract(v, "file", cuetils.String); err != nil {
+		return nil, fmt.Errorf("invalid config for %s: %w", "file", err)
+	} else if ok {
+		out.file = p
+	}
+
+	return out, nil
+}
 
 func ResolveIncludes(filenames ...string) ([]string, error) {
 	var errs error
@@ -22,19 +39,18 @@ func ResolveIncludes(filenames ...string) ([]string, error) {
 			continue
 		}
 
-		p, ok := cuetils.Get(v, "include")
-		if !ok {
-			continue
-		}
-
-		includes, err := includesFromValue(p)
+		p, ok, err := cuetils.Extract(v, "include", cuetils.List(includeFromStruct))
 		if err != nil {
 			errs = multierror.Append(errs, err)
 			continue
 		}
 
-		for _, include := range includes {
-			incs, err := ResolveIncludes(include)
+		if !ok {
+			continue
+		}
+
+		for _, include := range p {
+			incs, err := ResolveIncludes(include.file)
 			if err != nil {
 				errs = multierror.Append(errs, err)
 				continue
@@ -45,35 +61,4 @@ func ResolveIncludes(filenames ...string) ([]string, error) {
 	}
 
 	return resolved, errs
-}
-
-func includesFromValue(v cue.Value) ([]string, error) {
-	var errs error
-
-	if out, err := includesFromList(v); err == nil {
-		return out, nil
-	} else {
-		errs = multierror.Append(errs, err)
-	}
-
-	return nil, errs
-}
-
-func includesFromList(v cue.Value) ([]string, error) {
-	out := []string{}
-
-	err := cuetils.IterList(v, func(v cue.Value) error {
-		if p, ok := cuetils.Get(v, "file"); ok {
-			f, err := p.String()
-			if err == nil {
-				out = append(out, f)
-			}
-
-			return err
-		}
-
-		return nil
-	})
-
-	return out, err
 }

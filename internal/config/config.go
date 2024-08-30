@@ -25,19 +25,13 @@ func GetAllBackdrops(filenames ...string) (map[string]*api.Backdrop, error) {
 			continue
 		}
 
-		p, ok := cuetils.Get(value, "backdrops")
-		if !ok {
-			continue
-		}
-
-		bs, err := BackdropsFromValue(p)
-		if err != nil {
+		if p, ok, err := cuetils.Extract(value, "backdrops", cuetils.Map(BackdropFromStruct)); err != nil {
 			errs = multierror.Append(errs, err)
 			continue
-		}
-
-		for name, backdrop := range bs {
-			backdrops[name] = backdrop
+		} else if ok {
+			for name, backdrop := range p {
+				backdrops[name] = backdrop
+			}
 		}
 	}
 
