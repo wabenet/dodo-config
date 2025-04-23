@@ -48,13 +48,13 @@ backdrops:
       - SOMETHING
 
     volumes:
-      - foo:bar:ro
+      - "foo:bar:ro"
 
     ports:
-      - 8080:80
+      - "8080:80"
 
     devices:
-      - /dev/snd:/dev/snd
+      - "/dev/snd:/dev/snd"
 
   test_build:
     image:

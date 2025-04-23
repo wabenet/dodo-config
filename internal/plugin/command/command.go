@@ -11,7 +11,7 @@ import (
 	log "github.com/hashicorp/go-hclog"
 	"github.com/spf13/cobra"
 	"github.com/wabenet/dodo-config/internal/config"
-	api "github.com/wabenet/dodo-core/api/core/v1alpha5"
+	pluginapi "github.com/wabenet/dodo-core/api/plugin/v1alpha1"
 	core "github.com/wabenet/dodo-core/pkg/config"
 	"github.com/wabenet/dodo-core/pkg/plugin"
 	"github.com/wabenet/dodo-core/pkg/plugin/command"
@@ -35,9 +35,9 @@ func (p *Command) Type() plugin.Type {
 	return command.Type
 }
 
-func (p *Command) PluginInfo() *api.PluginInfo {
-	return &api.PluginInfo{
-		Name: &api.PluginName{Name: name, Type: command.Type.String()},
+func (p *Command) PluginInfo() *pluginapi.PluginInfo {
+	return &pluginapi.PluginInfo{
+		Name: &pluginapi.PluginName{Name: name, Type: command.Type.String()},
 	}
 }
 
@@ -114,7 +114,7 @@ func NewValidateCommand() *cobra.Command {
 				ToSlash: false,
 			})
 
-			fmt.Fprintf(os.Stdout, string(w.Bytes()))
+			fmt.Fprintf(os.Stdout, "%s\n", string(w.Bytes()))
 
 			return nil
 		},

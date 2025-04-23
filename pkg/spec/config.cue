@@ -15,9 +15,13 @@ backdrops: [string]: #Backdrop
   working_dir?:    string
   environment:     #Environment | [...#EnvironmentVariable] | [...string] | *[]
   ports:           #Ports       | [...#PortMapping]         | [...string] | *[]
+  mounts:          #Mounts      | [...#Mount]               | [...string] | *[]
+  capabilities:    [...string]  | *[]
+
+  // Deprecated
   volumes:         #Volumes     | [...#VolumeMount]         | [...string] | *[]
   devices:         #Devices     | [...#DeviceMapping]       | [...string] | *[]
-  capabilities:    [...string] | *[]
+
   ...
 }
 
@@ -50,25 +54,58 @@ backdrops: [string]: #Backdrop
   host_ip?:  string
 }
 
-#Volumes: [string]: #VolumeMount
+// Deprecated
+#Volumes: [string]: #VolumeMount | *#BindMount
 
-#VolumeMount: {
-  source:   string
+// Deprecated
+#Devices: [string]: #DeviceMapping
+
+// Deprecated
+#DeviceMapping: #DeviceMount | #DeviceRule
+
+#Mounts: [string]: #Mount
+
+#Mount: #BindMount | #VolumeMount | #TmpfsMount | #ImageMount | #DeviceMount | #DeviceRule
+
+#BindMount: {
+  type:     "bind"
+  source:   =~"/.*"
   target?:  string
   readonly: bool | *false
 }
 
-#Devices: [string]: #DeviceMapping
+#VolumeMount: {
+  type:     "volume"
+  source:   =~"[^/].*"
+  target:   string
+  path?:    string
+  readonly: bool | *false
+}
 
-#DeviceMapping: #DeviceMount | #DeviceRule
+#TmpfsMount: {
+  type:  "tmpfs"
+  path:  string
+  size?: int
+  mode?: string
+}
+
+#ImageMount: {
+  type:     "image"
+  source:   string
+  target:   string
+  path?:    string
+  readonly: bool | *false
+}
 
 #DeviceMount: {
+  type:        "device"
   source:       string
   target?:      string
   permissions?: string
 }
 
 #DeviceRule: {
+  type:        "device"
   cgroup_rule: string
 }
 

@@ -5,7 +5,7 @@ import (
 	"github.com/wabenet/dodo-config/pkg/cuetils"
 	"github.com/wabenet/dodo-config/pkg/includes"
 	"github.com/wabenet/dodo-config/pkg/spec"
-	api "github.com/wabenet/dodo-core/api/core/v1alpha5"
+	api "github.com/wabenet/dodo-core/api/configuration/v1alpha2"
 )
 
 func GetAllBackdrops(filenames ...string) (map[string]*api.Backdrop, error) {

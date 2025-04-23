@@ -13,7 +13,8 @@ type Extractor[V any] func(string, cue.Value) (V, error)
 func Extract[V any](value cue.Value, key string, extract Extractor[V]) (V, bool, error) {
 	var out V
 
-	p := value.LookupPath(cue.MakePath(cue.Str(key)))
+	def, _ := value.Default() // FIXME this feels broken...
+	p := def.LookupPath(cue.MakePath(cue.Str(key)))
 	if !p.Exists() {
 		return out, false, nil
 	}

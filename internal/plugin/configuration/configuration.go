@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	"github.com/wabenet/dodo-config/internal/config"
-	api "github.com/wabenet/dodo-core/api/core/v1alpha5"
+	api "github.com/wabenet/dodo-core/api/configuration/v1alpha2"
+	pluginapi "github.com/wabenet/dodo-core/api/plugin/v1alpha1"
 	core "github.com/wabenet/dodo-core/pkg/config"
 	"github.com/wabenet/dodo-core/pkg/plugin"
 	"github.com/wabenet/dodo-core/pkg/plugin/configuration"
@@ -26,9 +27,9 @@ func (p *Configuration) Type() plugin.Type {
 	return configuration.Type
 }
 
-func (p *Configuration) PluginInfo() *api.PluginInfo {
-	return &api.PluginInfo{
-		Name: &api.PluginName{Name: name, Type: configuration.Type.String()},
+func (p *Configuration) PluginInfo() *pluginapi.PluginInfo {
+	return &pluginapi.PluginInfo{
+		Name: &pluginapi.PluginName{Name: name, Type: configuration.Type.String()},
 	}
 }
 
