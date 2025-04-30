@@ -11,7 +11,6 @@ import (
 	log "github.com/hashicorp/go-hclog"
 	"github.com/spf13/cobra"
 	"github.com/wabenet/dodo-config/internal/config"
-	pluginapi "github.com/wabenet/dodo-core/api/plugin/v1alpha1"
 	core "github.com/wabenet/dodo-core/pkg/config"
 	"github.com/wabenet/dodo-core/pkg/plugin"
 	"github.com/wabenet/dodo-core/pkg/plugin/command"
@@ -35,10 +34,8 @@ func (p *Command) Type() plugin.Type {
 	return command.Type
 }
 
-func (p *Command) PluginInfo() *pluginapi.PluginInfo {
-	return &pluginapi.PluginInfo{
-		Name: &pluginapi.PluginName{Name: name, Type: command.Type.String()},
-	}
+func (p *Command) Metadata() plugin.Metadata {
+	return plugin.NewMetadata(command.Type, name)
 }
 
 func (*Command) Init() (plugin.Config, error) {

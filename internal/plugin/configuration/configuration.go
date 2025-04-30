@@ -4,8 +4,6 @@ import (
 	"fmt"
 
 	"github.com/wabenet/dodo-config/internal/config"
-	api "github.com/wabenet/dodo-core/api/configuration/v1alpha2"
-	pluginapi "github.com/wabenet/dodo-core/api/plugin/v1alpha1"
 	core "github.com/wabenet/dodo-core/pkg/config"
 	"github.com/wabenet/dodo-core/pkg/plugin"
 	"github.com/wabenet/dodo-core/pkg/plugin/configuration"
@@ -16,7 +14,7 @@ const name = "config"
 var _ configuration.Configuration = &Configuration{}
 
 type Configuration struct {
-	backdrops map[string]*api.Backdrop
+	backdrops map[string]configuration.Backdrop
 }
 
 func New() *Configuration {
@@ -27,10 +25,8 @@ func (p *Configuration) Type() plugin.Type {
 	return configuration.Type
 }
 
-func (p *Configuration) PluginInfo() *pluginapi.PluginInfo {
-	return &pluginapi.PluginInfo{
-		Name: &pluginapi.PluginName{Name: name, Type: configuration.Type.String()},
-	}
+func (p *Configuration) Metadata() plugin.Metadata {
+	return plugin.NewMetadata(configuration.Type, name)
 }
 
 func (p *Configuration) Init() (plugin.Config, error) {
@@ -39,7 +35,7 @@ func (p *Configuration) Init() (plugin.Config, error) {
 
 func (*Configuration) Cleanup() {}
 
-func (p *Configuration) get() (map[string]*api.Backdrop, error) {
+func (p *Configuration) get() (map[string]configuration.Backdrop, error) {
 	if p.backdrops != nil {
 		return p.backdrops, nil
 	}
@@ -54,10 +50,10 @@ func (p *Configuration) get() (map[string]*api.Backdrop, error) {
 	return p.backdrops, nil
 }
 
-func (p *Configuration) GetBackdrop(name string) (*api.Backdrop, error) {
+func (p *Configuration) GetBackdrop(name string) (configuration.Backdrop, error) {
 	bs, err := p.get()
 	if err != nil {
-		return nil, err
+		return configuration.Backdrop{}, err
 	}
 
 	for _, b := range bs {
@@ -72,11 +68,11 @@ func (p *Configuration) GetBackdrop(name string) (*api.Backdrop, error) {
 		}
 	}
 
-	return nil, fmt.Errorf("could not find any configuration for backdrop '%s'", name)
+	return configuration.Backdrop{}, fmt.Errorf("could not find any configuration for backdrop '%s'", name)
 }
 
-func (p *Configuration) ListBackdrops() ([]*api.Backdrop, error) {
-	result := []*api.Backdrop{}
+func (p *Configuration) ListBackdrops() ([]configuration.Backdrop, error) {
+	result := []configuration.Backdrop{}
 
 	bs, err := p.get()
 	if err != nil {

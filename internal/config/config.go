@@ -5,12 +5,12 @@ import (
 	"github.com/wabenet/dodo-config/pkg/cuetils"
 	"github.com/wabenet/dodo-config/pkg/includes"
 	"github.com/wabenet/dodo-config/pkg/spec"
-	api "github.com/wabenet/dodo-core/api/configuration/v1alpha2"
+	"github.com/wabenet/dodo-core/pkg/plugin/configuration"
 )
 
-func GetAllBackdrops(filenames ...string) (map[string]*api.Backdrop, error) {
+func GetAllBackdrops(filenames ...string) (map[string]configuration.Backdrop, error) {
 	var errs error
-	backdrops := map[string]*api.Backdrop{}
+	backdrops := map[string]configuration.Backdrop{}
 
 	resolved, err := includes.ResolveIncludes(filenames...)
 	if err != nil {
