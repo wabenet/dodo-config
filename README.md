@@ -1,13 +1,12 @@
 ![release](https://img.shields.io/github/v/release/wabenet/dodo-config?sort=semver)
-![build](https://img.shields.io/github/workflow/status/wabenet/dodo-config/CI?logo=github)
+![build](https://img.shields.io/github/actions/workflow/status/wabenet/dodo-config/ci.yaml?branch=main&logo=github)
 ![codecov](https://img.shields.io/codecov/c/github/wabenet/dodo-config?logo=codecov)
 ![codeclimate](https://img.shields.io/codeclimate/maintainability/wabenet/dodo-config?logo=codeclimate)
 ![license](https://img.shields.io/github/license/wabenet/dodo-config)
 
-# dodo config plugin
+# dodo-config
 
 Adds support to load dodo backdrops from configuration files.
-
 ## installation
 
 This plugin is already included in the dodo default distribution.
@@ -108,7 +107,7 @@ include:
 ## license & authors
 
 ```text
-Copyright 2022 Ole Claussen
+Copyright 2025 Ole Claussen
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
