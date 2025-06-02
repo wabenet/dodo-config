@@ -15,6 +15,7 @@ backdrops: [string]: #Backdrop
   working_dir?:    string
   environment:     #Environment | [...#EnvironmentVariable] | [...string] | *[]
   ports:           #Ports       | [...#PortMapping]         | [...string] | *[]
+  files:           #FileUploads | [...#FileUpload]                        | *[]
   mounts:          #Mounts      | [...#Mount]               | [...string] | *[]
   capabilities:    [...string]  | *[]
 
@@ -52,6 +53,13 @@ backdrops: [string]: #Backdrop
   publish:   string | int
   protocol?: string
   host_ip?:  string
+}
+
+#FileUploads: [string]: #FileUpload | string
+
+#FileUpload: {
+  path?:    string
+  contents: string
 }
 
 // Deprecated

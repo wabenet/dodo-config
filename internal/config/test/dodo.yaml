@@ -37,6 +37,10 @@ backdrops:
       rule:
         cgroup_rule: "c *:* rmw"
 
+    files:
+      /foo/hello.txt: |
+        Hello World!
+
     user: testuser
     working_dir: /home/test
     script: |
@@ -55,6 +59,10 @@ backdrops:
 
     devices:
       - "/dev/snd:/dev/snd"
+
+    files:
+      - path: /foo/hello.txt
+        contents: Hello World!
 
   test_build:
     image:

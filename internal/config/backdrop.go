@@ -67,6 +67,17 @@ func BackdropFromStruct(name string, value cue.Value) (configuration.Backdrop, e
 		out.ContainerConfig.Image = p
 	}
 
+	if p, ok, err := cuetils.Extract(value, "files", cuetils.ListOrDict(
+		cuetils.Either([]cuetils.Extractor[configuration.File]{
+			FileUploadFromString,
+			FileUploadFromStruct,
+		}),
+	)); err != nil {
+		return out, fmt.Errorf("invalid config for %s: %w", "files", err)
+	} else if ok {
+		out.RequiredFiles = p
+	}
+
 	if p, ok, err := cuetils.Extract(value, "script", cuetils.String); err != nil {
 		return out, fmt.Errorf("invalid config for %s: %w", "script", err)
 	} else if ok {
@@ -245,6 +256,36 @@ func PortBindingFromStruct(name string, value cue.Value) (runtime.PortBinding, e
 		return out, fmt.Errorf("invalid config for %s: %w", "host_ip", err)
 	} else if ok {
 		out.HostIP = p
+	}
+
+	return out, nil
+}
+
+func FileUploadFromStruct(name string, value cue.Value) (configuration.File, error) {
+	out := configuration.File{FilePath: name}
+
+	if p, ok, err := cuetils.Extract(value, "path", cuetils.String); err != nil {
+		return out, fmt.Errorf("invalid config for %s: %w", "path", err)
+	} else if ok {
+		out.FilePath = p
+	}
+
+	if p, ok, err := cuetils.Extract(value, "contents", cuetils.String); err != nil {
+		return out, fmt.Errorf("invalid config for %s: %w", "contents", err)
+	} else if ok {
+		out.Contents = []byte(p)
+	}
+
+	return out, nil
+}
+
+func FileUploadFromString(name string, value cue.Value) (configuration.File, error) {
+	out := configuration.File{FilePath: name}
+
+	if p, err := cuetils.String(name, value); err != nil {
+		return out, fmt.Errorf("invalid config for %s: %w", "name", err)
+	} else {
+		out.Contents = []byte(p)
 	}
 
 	return out, nil

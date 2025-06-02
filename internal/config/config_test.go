@@ -24,8 +24,8 @@ func TestBasicBackdrop(t *testing.T) {
 	assert.Equal(t, "testimage", backdrop.ContainerConfig.Image)
 	assert.Equal(t, "testcontainer", backdrop.ContainerConfig.Name)
 	assert.Equal(t, "/home/test", backdrop.ContainerConfig.Process.WorkingDir)
-	assert.Equal(t, runtime.Entrypoint{"/bin/sh", backdrop.RequiredFiles[0].FilePath}, backdrop.ContainerConfig.Process.Entrypoint)
-	assert.Equal(t, []byte("echo \"$@\"\n"), backdrop.RequiredFiles[0].Contents)
+	assert.Equal(t, runtime.Entrypoint{"/bin/sh", backdrop.RequiredFiles[1].FilePath}, backdrop.ContainerConfig.Process.Entrypoint)
+	assert.Equal(t, []byte("echo \"$@\"\n"), backdrop.RequiredFiles[1].Contents)
 }
 
 func TestBuildInfo(t *testing.T) {
@@ -92,6 +92,24 @@ func TestPortBindingsWithList(t *testing.T) {
 	assert.Contains(t, backdrop.ContainerConfig.Ports, runtime.PortBinding{
 		ContainerPort: "80",
 		HostPort:      "8080",
+	})
+}
+
+func TestFullFiles(t *testing.T) {
+	backdrop := loadBackdrop(t, "test_full_configs")
+
+	assert.Contains(t, backdrop.RequiredFiles, configuration.File{
+		FilePath: "/foo/hello.txt",
+		Contents: []byte("Hello World!\n"),
+	})
+}
+
+func TestFilesWithLists(t *testing.T) {
+	backdrop := loadBackdrop(t, "test_with_lists")
+
+	assert.Contains(t, backdrop.RequiredFiles, configuration.File{
+		FilePath: "/foo/hello.txt",
+		Contents: []byte("Hello World!"),
 	})
 }
 
