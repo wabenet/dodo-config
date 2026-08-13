@@ -224,32 +224,54 @@ func EnvironmentVariableFromStruct(name string, value cue.Value) (runtime.Enviro
 }
 
 func PortBindingFromStruct(name string, value cue.Value) (runtime.PortBinding, error) {
-	out := runtime.PortBinding{HostPort: name}
+	out := runtime.PortBinding{}
+
+	port, pErr := strconv.ParseUint(name, 10, 16)
+	if pErr == nil {
+		out.HostPort = uint16(port)
+	}
 
 	if p, ok, err := cuetils.Extract(value, "target", cuetils.String); err != nil {
 		if p, ok, err := cuetils.Extract(value, "target", cuetils.Int); err != nil {
 			return out, fmt.Errorf("invalid config for %s: %w", "target", err)
 		} else if ok {
-			out.ContainerPort = strconv.FormatInt(p, 10)
+			out.ContainerPort = uint16(p)
 		}
 	} else if ok {
-		out.HostPort = p
+		port, pErr := strconv.ParseUint(p, 10, 16)
+		if pErr != nil {
+			return out, fmt.Errorf("invalid port for %s: %w", name, pErr)
+		}
+
+		out.HostPort = uint16(port)
 	}
 
 	if p, ok, err := cuetils.Extract(value, "publish", cuetils.String); err != nil {
 		if p, ok, err := cuetils.Extract(value, "publish", cuetils.Int); err != nil {
 			return out, fmt.Errorf("invalid config for %s: %w", "publish", err)
 		} else if ok {
-			out.HostPort = strconv.FormatInt(p, 10)
+			out.HostPort = uint16(p)
 		}
 	} else if ok {
-		out.ContainerPort = p
+		port, pErr := strconv.ParseUint(p, 10, 16)
+		if pErr != nil {
+			return out, fmt.Errorf("invalid port for %s: %w", name, pErr)
+		}
+
+		out.ContainerPort = uint16(port)
 	}
 
 	if p, ok, err := cuetils.Extract(value, "protocol", cuetils.String); err != nil {
 		return out, fmt.Errorf("invalid config for %s: %w", "protocol", err)
 	} else if ok {
-		out.Protocol = p
+		switch p {
+		case string(runtime.TCP):
+			out.Protocol = runtime.TCP
+		case string(runtime.UDP):
+			out.Protocol = runtime.UDP
+		default:
+			return out, fmt.Errorf("invalid protocol for %s", name)
+		}
 	}
 
 	if p, ok, err := cuetils.Extract(value, "host_ip", cuetils.String); err != nil {

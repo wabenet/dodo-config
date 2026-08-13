@@ -80,8 +80,8 @@ func TestFullPortBindings(t *testing.T) {
 	backdrop := loadBackdrop(t, "test_full_configs")
 
 	assert.Contains(t, backdrop.ContainerConfig.Ports, runtime.PortBinding{
-		ContainerPort: "80",
-		HostPort:      "8080",
+		ContainerPort: 80,
+		HostPort:      8080,
 		HostIP:        "192.168.0.1",
 	})
 }
@@ -90,8 +90,8 @@ func TestPortBindingsWithList(t *testing.T) {
 	backdrop := loadBackdrop(t, "test_with_lists")
 
 	assert.Contains(t, backdrop.ContainerConfig.Ports, runtime.PortBinding{
-		ContainerPort: "80",
-		HostPort:      "8080",
+		ContainerPort: 80,
+		HostPort:      8080,
 	})
 }
 
