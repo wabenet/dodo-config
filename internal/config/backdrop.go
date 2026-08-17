@@ -1,13 +1,14 @@
 package config
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"path"
 	"strconv"
 
 	"cuelang.org/go/cue"
-	"github.com/docker/docker/pkg/stringid"
 	"github.com/wabenet/dodo-config/pkg/cuetils"
 	"github.com/wabenet/dodo-core/pkg/plugin/builder"
 	"github.com/wabenet/dodo-core/pkg/plugin/configuration"
@@ -81,7 +82,11 @@ func BackdropFromStruct(name string, value cue.Value) (configuration.Backdrop, e
 	if p, ok, err := cuetils.Extract(value, "script", cuetils.String); err != nil {
 		return out, fmt.Errorf("invalid config for %s: %w", "script", err)
 	} else if ok {
-		tmpPath := fmt.Sprintf("/tmp/dodo-%s/", stringid.GenerateRandomID()[:20])
+		b := make([]byte, 32)
+		rand.Read(b)
+		id := hex.EncodeToString(b)
+		tmpPath := fmt.Sprintf("/tmp/dodo-%s/", id[:20])
+
 		out.RequiredFiles = append(out.RequiredFiles, configuration.File{
 			FilePath: path.Join(tmpPath, "entrypoint"),
 			Contents: []byte(p),

@@ -5,7 +5,6 @@ go 1.26.0
 require (
 	cuelang.org/go v0.17.1
 	github.com/Masterminds/sprig v2.22.0+incompatible
-	github.com/docker/docker v28.5.2+incompatible
 	github.com/hashicorp/go-hclog v1.6.3
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/spf13/cobra v1.10.2
